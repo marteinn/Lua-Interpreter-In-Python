@@ -1,6 +1,17 @@
 # Lua to Python 2
 
-This is my second take on writing a Lua-To-Python compiler.
+This is my second take on writing a Lua-To-Python compiler, it includes:
+
+- [x] Lexer
+- [x] Parser
+- [x] A internal AST representation
+- [x] Repl
+- [ ] Python AST compilation
+
+
+## Running repl
+
+- `python repl.py`
 
 
 ## References

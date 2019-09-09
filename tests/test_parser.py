@@ -11,6 +11,7 @@ class ParserTest(unittest.TestCase):
         tests = (
             ("-1", "(-1)"),
             ("not 1", "(not 1)"),
+            ("not not 1", "(not (not 1))"),
         )
 
         for source, expected in tests:
