@@ -1,0 +1,8 @@
+# Lua to Python 2
+
+This is my second take on writing a Lua-To-Python compiler.
+
+
+## References
+- A lot of the work here is based on the book [Writing A Compiler In Go](https://compilerbook.com/)
+- [My first take](https://github.com/marteinn/Lua-To-Python)
