@@ -32,6 +32,21 @@ class EvaluatorTest(unittest.TestCase):
             self.assertEqual(type(evaluated), obj.Boolean)
             self.assertEqual(evaluated.value, expected)
 
+    def test_not_prefix_operator(self):
+        tests = [
+            ("not false", True),
+            ("not 5", False),
+            ("not 0", False),
+            ("not not 0", True),
+            ("not not true", True),
+        ]
+
+        for source, expected in tests:
+            evaluated = source_to_eval(source)
+
+            self.assertEqual(type(evaluated), obj.Boolean)
+            self.assertEqual(evaluated.value, expected)
+
 
 def source_to_eval(source) -> obj.Obj:
     lexer = Lexer(StringIO(source))

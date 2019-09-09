@@ -157,6 +157,6 @@ class CallExpression(Expression):
     def to_code(self) -> str:
         out = "{0}({1})".format(
             self.function.to_code(),
-            ", ".join([x.to_code() for x in self.arguments])
+            ", ".join([x.to_code() for x in self.arguments]),
         )
         return out

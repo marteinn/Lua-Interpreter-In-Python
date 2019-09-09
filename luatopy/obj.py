@@ -6,6 +6,7 @@ from enum import Enum, auto
 class ObjType(Enum):
     INTEGER = auto()
     BOOLEAN = auto()
+    NULL = auto()
 
 
 class Obj:
