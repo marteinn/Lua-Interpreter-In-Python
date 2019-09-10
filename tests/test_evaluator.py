@@ -10,8 +10,14 @@ from luatopy import evaluator
 class EvaluatorTest(unittest.TestCase):
     def test_integer_expressions(self):
         tests = [
-            ("10", 10),
             ("1", 1),
+            ("10", 10),
+            ("-1", -1),
+            ("-10", -10),
+            ("5 + 5 + 3 + 7", 20),
+            ("5 - 5", 0),
+            ("1 * 5 * 5", 25),
+            ("-10 * 5 + 5 * (2 + 2)", -30),
         ]
 
         for source, expected in tests:
@@ -20,10 +26,29 @@ class EvaluatorTest(unittest.TestCase):
             self.assertEqual(type(evaluated), obj.Integer)
             self.assertEqual(evaluated.value, expected)
 
+    def test_float_expressions(self):
+        tests = [
+            ("4 / 2", 2.0),
+        ]
+
+        for source, expected in tests:
+            evaluated = source_to_eval(source)
+
+            self.assertEqual(type(evaluated), obj.Float)
+            self.assertEqual(evaluated.value, expected)
+
     def test_boolean_expressions(self):
         tests = [
             ("false", False),
             ("true", True),
+            ("1 > 2", False),
+            ("1 >= 2", False),
+            ("1 < 2", True),
+            ("1 <= 2", True),
+            ("1 == 1", True),
+            ("1 ~= 1", False),
+            ("1 == 2", False),
+            ("1 ~= 2", True),
         ]
 
         for source, expected in tests:

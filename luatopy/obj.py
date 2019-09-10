@@ -5,6 +5,7 @@ from enum import Enum, auto
 
 class ObjType(Enum):
     INTEGER = auto()
+    FLOAT = auto()
     BOOLEAN = auto()
     NULL = auto()
 
@@ -23,6 +24,17 @@ class Integer(Obj):
 
     def type(self) -> ObjType:
         return ObjType.INTEGER
+
+    def inspect(self) -> str:
+        return str(self.value)
+
+
+@dataclass
+class Float(Obj):
+    value: float = 0.0
+
+    def type(self) -> ObjType:
+        return ObjType.FLOAT
 
     def inspect(self) -> str:
         return str(self.value)
