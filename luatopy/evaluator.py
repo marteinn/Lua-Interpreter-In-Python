@@ -41,7 +41,36 @@ def evaluate(node: ast.Node):
             infix_exp.operator, infix_left, infix_right
         )
 
+    if klass == ast.BlockStatement:
+        block_statement: ast.BlockStatement = cast(ast.BlockStatement, node)
+        return evaluate_statements(block_statement.statements)
+
+    if klass == ast.IfExpression:
+        if_exp: ast.IfExpression = cast(ast.IfExpression, node)
+        return eval_if_expression(if_exp)
+
     return None
+
+
+
+def eval_if_expression(if_exp: ast.IfExpression):
+    condition = evaluate(if_exp.condition)
+
+    if is_truthy(condition):
+        return evaluate(if_exp.consequence)
+    elif if_exp.alternative:
+        return evaluate(if_exp.alternative)
+    return NULL
+
+
+def is_truthy(obj: obj.Obj) -> bool:
+    if obj == NULL:
+        return False
+    if obj == TRUE:
+        return True
+    if obj == FALSE:
+        return False
+    return True
 
 
 def evaluate_statements(statements):

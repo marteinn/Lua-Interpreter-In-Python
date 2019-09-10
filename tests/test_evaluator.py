@@ -74,6 +74,25 @@ class EvaluatorTest(unittest.TestCase):
             self.assertEqual(type(evaluated), obj.Boolean)
             self.assertEqual(evaluated.value, expected)
 
+    def test_if_else_expressions(self):
+        tests = [
+            ("if true then 10 end", 10),
+            ("if 1 then 10 end", 10),
+            ("if false then 10 end", evaluator.NULL),
+            ("if 10 > 5 then 10 end", 10),
+            ("if 5 < 2 then 10 end", evaluator.NULL),
+            ("if false then 10 else 5 end", 5),
+            ("if true then 10 else 5 end", 10),
+        ]
+
+        for source, expected in tests:
+            evaluated = source_to_eval(source)
+
+            if evaluated == evaluator.NULL:
+                self.assertEqual(evaluated, expected)
+            else:
+                self.assertEqual(evaluated.value, expected)
+
 
 def source_to_eval(source) -> obj.Obj:
     lexer = Lexer(StringIO(source))
