@@ -26,7 +26,7 @@ def evaluate(node: ast.Node):
 
     if klass == ast.Boolean:
         boolean: ast.Boolean = cast(ast.Boolean, node)
-        return TRUE if boolean.value else FALSE
+        return native_bool_to_bool_obj(boolean.value)
 
     if klass == ast.PrefixExpression:
         prefix_exp: ast.PrefixExpression = cast(ast.PrefixExpression, node)
@@ -86,6 +86,12 @@ def evaluate_infix_expression(
         right_val = cast(obj.Integer, right)
         return evaluate_infix_integer_expression(operator, left_val, right_val)
 
+    if operator == "==":
+        return native_bool_to_bool_obj(left == right)
+
+    if operator == "~=":
+        return native_bool_to_bool_obj(left != right)
+
     return NULL
 
 
@@ -105,21 +111,25 @@ def evaluate_infix_integer_expression(
         return obj.Float(left.value / right.value)
 
     if operator == ">":
-        return obj.Boolean(left.value > right.value)
+        return native_bool_to_bool_obj(left.value > right.value)
 
     if operator == ">=":
-        return obj.Boolean(left.value >= right.value)
+        return native_bool_to_bool_obj(left.value >= right.value)
 
     if operator == "<":
-        return obj.Boolean(left.value < right.value)
+        return native_bool_to_bool_obj(left.value < right.value)
 
     if operator == "<=":
-        return obj.Boolean(left.value <= right.value)
+        return native_bool_to_bool_obj(left.value <= right.value)
 
     if operator == "==":
-        return obj.Boolean(left.value == right.value)
+        return native_bool_to_bool_obj(left.value == right.value)
 
     if operator == "~=":
-        return obj.Boolean(left.value != right.value)
+        return native_bool_to_bool_obj(left.value != right.value)
 
     return NULL
+
+
+def native_bool_to_bool_obj(value: bool) -> obj.Boolean:
+    return TRUE if value else FALSE

@@ -49,6 +49,8 @@ class EvaluatorTest(unittest.TestCase):
             ("1 ~= 1", False),
             ("1 == 2", False),
             ("1 ~= 2", True),
+            ("(2 > 1) == true", True),
+            ("(2 < 1) == false", True),
         ]
 
         for source, expected in tests:
