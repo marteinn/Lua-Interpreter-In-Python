@@ -8,6 +8,7 @@ class ObjType(Enum):
     FLOAT = auto()
     BOOLEAN = auto()
     NULL = auto()
+    RETURN = auto()
 
 
 class Obj:
@@ -57,3 +58,14 @@ class Null(Obj):
 
     def inspect(self) -> str:
         return "nil"
+
+
+@dataclass
+class ReturnValue(Obj):
+    value: Obj
+
+    def type(self) -> ObjType:
+        return ObjType.RETURN
+
+    def inspect(self) -> str:
+        return self.value.inspect()

@@ -93,6 +93,32 @@ class EvaluatorTest(unittest.TestCase):
             else:
                 self.assertEqual(evaluated.value, expected)
 
+    def test_return_statements(self):
+        tests = [
+            ("return 5", 5),
+            ("""return 5
+10
+""", 5),
+            ("return 5*5", 25),
+            ("""10
+return 5
+""", 5),
+            ("""
+             if true then
+                if true then
+                    return 10
+                end
+                return 5
+             end
+             """, 10),
+        ]
+
+        for source, expected in tests:
+            evaluated = source_to_eval(source)
+
+            self.assertEqual(type(evaluated), obj.Integer)
+            self.assertEqual(evaluated.value, expected)
+
 
 def source_to_eval(source) -> obj.Obj:
     lexer = Lexer(StringIO(source))

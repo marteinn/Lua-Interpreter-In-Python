@@ -14,7 +14,7 @@ def evaluate(node: ast.Node):
 
     if klass == ast.Program:
         program: ast.Program = cast(ast.Program, node)
-        return evaluate_statements(program.statements)
+        return evaluate_program(program)
 
     if klass == ast.ExpressionStatement:
         exp: ast.ExpressionStatement = cast(ast.ExpressionStatement, node)
@@ -43,14 +43,40 @@ def evaluate(node: ast.Node):
 
     if klass == ast.BlockStatement:
         block_statement: ast.BlockStatement = cast(ast.BlockStatement, node)
-        return evaluate_statements(block_statement.statements)
+        return evaluate_block_statement(block_statement)
 
     if klass == ast.IfExpression:
         if_exp: ast.IfExpression = cast(ast.IfExpression, node)
         return eval_if_expression(if_exp)
 
+    if klass == ast.ReturnStatement:
+        return_statement: ast.ReturnStatement = cast(ast.ReturnStatement, node)
+        return_value: obj.Obj = evaluate(return_statement.value)
+        return obj.ReturnValue(return_value)
+
     return None
 
+
+def evaluate_program(program: ast.Program):
+    result = None
+    for statement in program.statements:
+        result = evaluate(statement)
+
+        if type(result) == obj.ReturnValue:
+            return_value: obj.ReturnValue = cast(obj.ReturnValue, result)
+            return return_value.value
+
+    return result
+
+
+def evaluate_block_statement(block_statement: ast.BlockStatement):
+    result = None
+    for statement in block_statement.statements:
+        result = evaluate(statement)
+        if result != None and result.type() == obj.ObjType.RETURN:
+            return result
+
+    return result
 
 
 def eval_if_expression(if_exp: ast.IfExpression):
@@ -77,6 +103,10 @@ def evaluate_statements(statements):
     result = None
     for statement in statements:
         result = evaluate(statement)
+
+        if type(result) == obj.ReturnValue:
+            return_value: obj.ReturnValue = cast(obj.ReturnValue, result)
+            return return_value.value
 
     return result
 
