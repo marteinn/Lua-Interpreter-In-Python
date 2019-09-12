@@ -9,6 +9,7 @@ class ObjType(Enum):
     BOOLEAN = auto()
     NULL = auto()
     RETURN = auto()
+    ERROR = auto()
 
 
 class Obj:
@@ -69,3 +70,18 @@ class ReturnValue(Obj):
 
     def inspect(self) -> str:
         return self.value.inspect()
+
+
+@dataclass
+class Error(Obj):
+    message: str
+
+    @staticmethod
+    def create(str_format, *args):
+        return Error(message=str_format.format(*args))
+
+    def type(self) -> ObjType:
+        return ObjType.ERROR
+
+    def inspect(self) -> str:
+        return "ERROR: {}".format(self.message)

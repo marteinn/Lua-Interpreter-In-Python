@@ -31,12 +31,23 @@ def evaluate(node: ast.Node):
     if klass == ast.PrefixExpression:
         prefix_exp: ast.PrefixExpression = cast(ast.PrefixExpression, node)
         prefix_right: obj.Obj = evaluate(prefix_exp.right)
+
+        if is_error(prefix_right):
+            return prefix_right
+
         return evaluate_prefix_expression(prefix_exp.operator, prefix_right)
 
     if klass == ast.InfixExpression:
         infix_exp: ast.InfixExpression = cast(ast.InfixExpression, node)
+
         infix_left: obj.Obj = evaluate(infix_exp.left)
+        if is_error(infix_left):
+            return infix_left
+
         infix_right: obj.Obj = evaluate(infix_exp.right)
+        if is_error(infix_right):
+            return infix_right
+
         return evaluate_infix_expression(
             infix_exp.operator, infix_left, infix_right
         )
@@ -52,6 +63,8 @@ def evaluate(node: ast.Node):
     if klass == ast.ReturnStatement:
         return_statement: ast.ReturnStatement = cast(ast.ReturnStatement, node)
         return_value: obj.Obj = evaluate(return_statement.value)
+        if is_error(return_value):
+            return return_value
         return obj.ReturnValue(return_value)
 
     return None
@@ -65,6 +78,8 @@ def evaluate_program(program: ast.Program):
         if type(result) == obj.ReturnValue:
             return_value: obj.ReturnValue = cast(obj.ReturnValue, result)
             return return_value.value
+        if type(result) == obj.Error:
+            return result
 
     return result
 
@@ -73,8 +88,9 @@ def evaluate_block_statement(block_statement: ast.BlockStatement):
     result = None
     for statement in block_statement.statements:
         result = evaluate(statement)
-        if result != None and result.type() == obj.ObjType.RETURN:
-            return result
+        if result != None:
+            if result.type() in [obj.ObjType.RETURN, obj.ObjType.ERROR]:
+                return result
 
     return result
 
@@ -82,10 +98,14 @@ def evaluate_block_statement(block_statement: ast.BlockStatement):
 def eval_if_expression(if_exp: ast.IfExpression):
     condition = evaluate(if_exp.condition)
 
+    if is_error(condition):
+        return condition
+
     if is_truthy(condition):
         return evaluate(if_exp.consequence)
     elif if_exp.alternative:
         return evaluate(if_exp.alternative)
+
     return NULL
 
 
@@ -116,7 +136,8 @@ def evaluate_prefix_expression(operator: str, right: obj.Obj) -> obj.Obj:
         return evaluate_not_operator_expression(right)
     if operator == "-":
         return evaluate_minus_operator_expression(right)
-    return NULL
+
+    return obj.Error.create("Unknown operator {0}{0}", operator, right.inspect())
 
 
 def evaluate_not_operator_expression(right: obj.Obj) -> obj.Boolean:
@@ -130,6 +151,9 @@ def evaluate_not_operator_expression(right: obj.Obj) -> obj.Boolean:
 
 
 def evaluate_minus_operator_expression(right: obj.Obj) -> obj.Obj:
+    if right.type() == obj.ObjType.BOOLEAN:
+        return obj.Error.create("Attempt to perform arithmetic on a boolean value")
+
     if type(right) != obj.Integer:
         return NULL
 
@@ -145,13 +169,22 @@ def evaluate_infix_expression(
         right_val = cast(obj.Integer, right)
         return evaluate_infix_integer_expression(operator, left_val, right_val)
 
+    if (
+        obj.ObjType.BOOLEAN in [left.type(), right.type()]
+        and operator in ["+", "-", "*", "/"]
+    ):
+        return obj.Error.create("Attempt to perform arithmetic on a boolean value")
+
+    # if left.type() != right.type():
+        # return obj.Error.create("Type mismatch")
+
     if operator == "==":
         return native_bool_to_bool_obj(left == right)
 
     if operator == "~=":
         return native_bool_to_bool_obj(left != right)
 
-    return NULL
+    return obj.Error.create("Unknown infix operator {0}", operator)
 
 
 def evaluate_infix_integer_expression(
@@ -192,3 +225,10 @@ def evaluate_infix_integer_expression(
 
 def native_bool_to_bool_obj(value: bool) -> obj.Boolean:
     return TRUE if value else FALSE
+
+
+def is_error(instance: obj.Obj) -> bool:
+    if instance == None:
+        return False
+
+    return instance.type() == obj.ObjType.ERROR

@@ -119,6 +119,44 @@ return 5
             self.assertEqual(type(evaluated), obj.Integer)
             self.assertEqual(evaluated.value, expected)
 
+    def test_error_handling(self):
+        tests = [
+            ("1 + true", "Attempt to perform arithmetic on a boolean value"),
+            ("-true", "Attempt to perform arithmetic on a boolean value"),
+            (
+"""1 + true
+5
+""", "Attempt to perform arithmetic on a boolean value"),
+            ("true + false", "Attempt to perform arithmetic on a boolean value"),
+            (
+                "if true then true + false end",
+                "Attempt to perform arithmetic on a boolean value"
+            ),
+            (
+                "if true then if true then true + false end end",
+                "Attempt to perform arithmetic on a boolean value"
+            ),
+(
+"""5
+true + false
+6
+""", "Attempt to perform arithmetic on a boolean value"),
+            (
+                "if true then if true then return true + false end return 5 end",
+                "Attempt to perform arithmetic on a boolean value"
+            ),
+            (
+                "if true + false then 1 else 2 end",
+                "Attempt to perform arithmetic on a boolean value"
+            ),
+        ]
+
+        for source, expected in tests:
+            evaluated = source_to_eval(source)
+
+            self.assertEqual(type(evaluated), obj.Error)
+            self.assertEqual(evaluated.message, expected)
+
 
 def source_to_eval(source) -> obj.Obj:
     lexer = Lexer(StringIO(source))
