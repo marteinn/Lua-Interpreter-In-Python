@@ -79,10 +79,18 @@ def evaluate(node: ast.Node, env: obj.Environment):
         identifier: ast.Identifier = cast(ast.Identifier, node)
         return evaluate_identifier(identifier, env)
 
+    if klass == ast.FunctionLiteral:
+        fn_literal: ast.FunctionLiteral = cast(ast.FunctionLiteral, node)
+        return obj.Function(
+            body=fn_literal.body, parameters=fn_literal.parameters, env=env
+        )
+
     return None
 
 
-def evaluate_identifier(identifier: ast.Identifier, env: obj.Environment) -> obj.Obj:
+def evaluate_identifier(
+    identifier: ast.Identifier, env: obj.Environment
+) -> obj.Obj:
     val, found = env.get(identifier.value, NULL)
     if not found:
         return obj.Error.create("Identifier {0} not found", identifier.value)

@@ -15,6 +15,12 @@ This is my second take on writing a Lua-To-Python compiler, it includes:
 - `python repl.py`
 
 
+## TODO
+- [ ] Introduce `;` as a separator
+- [ ] Named functions
+- [ ] Not defined variables should return `nil`
+
+
 ## References
 - A lot of the work here is based on the book [Writing A Compiler In Go](https://compilerbook.com/)
 - [My first take](https://github.com/marteinn/Lua-To-Python)

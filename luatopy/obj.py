@@ -1,7 +1,8 @@
-from dataclasses import dataclass
-from typing import Any, Dict, Tuple
-
+from dataclasses import dataclass, field
+from typing import Any, Dict, Tuple, List
 from enum import Enum, auto
+
+from luatopy import ast
 
 
 class ObjType(Enum):
@@ -11,6 +12,7 @@ class ObjType(Enum):
     NULL = auto()
     RETURN = auto()
     ERROR = auto()
+    FUNCTION = auto()
 
 
 class Obj:
@@ -19,6 +21,22 @@ class Obj:
 
     def inspect(self) -> str:
         pass
+
+
+class Environment:
+    def __init__(self):
+        self.store: Dict[str, Obj] = {}
+
+    def get(self, name: str, default: Obj) -> Tuple[Obj, bool]:
+        val = self.store.get(name, default)
+        return (val, self.contains(name))
+
+    def contains(self, name: str) -> bool:
+        return name in self.store
+
+    def set(self, name: str, value: Obj) -> Obj:
+        self.store[name] = value
+        return value
 
 
 @dataclass
@@ -88,17 +106,20 @@ class Error(Obj):
         return "ERROR: {}".format(self.message)
 
 
-class Environment:
-    def __init__(self):
-        self.store: Dict[str, Obj] = {}
+@dataclass
+class Function(Obj):
+    body: ast.BlockStatement
+    env: Environment
+    parameters: List[ast.Identifier] = field(default_factory=list)
 
-    def get(self, name: str, default: Obj) -> Tuple[Obj, bool]:
-        val = self.store.get(name, default)
-        return (val, self.contains(name))
+    def type(self) -> ObjType:
+        return ObjType.FUNCTION
 
-    def contains(self, name: str) -> bool:
-        return name in self.store
+    def inspect(self) -> str:
+        out: str = ""
+        signature = ", ".join([x.value for x in self.parameters])
 
-    def set(self, name: str, value: Obj) -> Obj:
-        self.store[name] = value
-        return value
+        out = "function ({0}) ".format(signature)
+        out = out + self.body.to_code()
+        out = out + " end"
+        return out

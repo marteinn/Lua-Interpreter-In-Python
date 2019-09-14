@@ -181,6 +181,18 @@ c""", 10),
             self.assertEqual(evaluated.value, expected)
 
 
+    def test_function_declaration(self):
+        tests = [
+            ("function (a) a + 1 end", "function (a) (a + 1) end"),
+        ]
+
+        for source, expected in tests:
+            evaluated = source_to_eval(source)
+
+            self.assertEqual(type(evaluated), obj.Function)
+            self.assertEqual(evaluated.inspect(), expected)
+
+
 def source_to_eval(source) -> obj.Obj:
     lexer = Lexer(StringIO(source))
     parser = Parser(lexer)
