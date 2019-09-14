@@ -4,6 +4,7 @@ import click
 
 from luatopy.lexer import Lexer
 from luatopy.parser import Parser
+from luatopy.obj import Environment
 from luatopy import evaluator
 
 
@@ -18,6 +19,7 @@ def run(tokens, ast_code):
     if ast_code:
         print("* Config: Show ast code")
 
+    env = Environment()
     while True:
         source = input(">>> ")
         lexer = Lexer(StringIO(source))
@@ -34,8 +36,9 @@ def run(tokens, ast_code):
         if ast_code:
             print(program.to_code())
 
-        evaluated = evaluator.evaluate(program)
-        print(evaluated.inspect())
+        evaluated = evaluator.evaluate(program, env)
+        if evaluated:
+            print(evaluated.inspect())
 
 
 if __name__ == '__main__':

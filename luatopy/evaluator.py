@@ -9,16 +9,16 @@ FALSE = obj.Boolean(value=False)
 NULL = obj.Null()
 
 
-def evaluate(node: ast.Node):
+def evaluate(node: ast.Node, env: obj.Environment):
     klass = type(node)
 
     if klass == ast.Program:
         program: ast.Program = cast(ast.Program, node)
-        return evaluate_program(program)
+        return evaluate_program(program, env)
 
     if klass == ast.ExpressionStatement:
         exp: ast.ExpressionStatement = cast(ast.ExpressionStatement, node)
-        return evaluate(exp.expression)
+        return evaluate(exp.expression, env)
 
     if klass == ast.IntegerLiteral:
         integer_literal: ast.IntegerLiteral = cast(ast.IntegerLiteral, node)
@@ -30,7 +30,7 @@ def evaluate(node: ast.Node):
 
     if klass == ast.PrefixExpression:
         prefix_exp: ast.PrefixExpression = cast(ast.PrefixExpression, node)
-        prefix_right: obj.Obj = evaluate(prefix_exp.right)
+        prefix_right: obj.Obj = evaluate(prefix_exp.right, env)
 
         if is_error(prefix_right):
             return prefix_right
@@ -40,11 +40,11 @@ def evaluate(node: ast.Node):
     if klass == ast.InfixExpression:
         infix_exp: ast.InfixExpression = cast(ast.InfixExpression, node)
 
-        infix_left: obj.Obj = evaluate(infix_exp.left)
+        infix_left: obj.Obj = evaluate(infix_exp.left, env)
         if is_error(infix_left):
             return infix_left
 
-        infix_right: obj.Obj = evaluate(infix_exp.right)
+        infix_right: obj.Obj = evaluate(infix_exp.right, env)
         if is_error(infix_right):
             return infix_right
 
@@ -54,26 +54,46 @@ def evaluate(node: ast.Node):
 
     if klass == ast.BlockStatement:
         block_statement: ast.BlockStatement = cast(ast.BlockStatement, node)
-        return evaluate_block_statement(block_statement)
+        return evaluate_block_statement(block_statement, env)
 
     if klass == ast.IfExpression:
         if_exp: ast.IfExpression = cast(ast.IfExpression, node)
-        return eval_if_expression(if_exp)
+        return eval_if_expression(if_exp, env)
 
     if klass == ast.ReturnStatement:
         return_statement: ast.ReturnStatement = cast(ast.ReturnStatement, node)
-        return_value: obj.Obj = evaluate(return_statement.value)
+        return_value: obj.Obj = evaluate(return_statement.value, env)
         if is_error(return_value):
             return return_value
         return obj.ReturnValue(return_value)
 
+    if klass == ast.AssignStatement:
+        assignment: ast.AssignStatement = cast(ast.AssignStatement, node)
+        assignment_value: obj.Obj = evaluate(assignment.value, env)
+        if is_error(assignment_value):
+            return assignment_value
+        env.set(assignment.name.value, assignment_value)
+        return None
+
+    if klass == ast.Identifier:
+        identifier: ast.Identifier = cast(ast.Identifier, node)
+        return evaluate_identifier(identifier, env)
+
     return None
 
 
-def evaluate_program(program: ast.Program):
+def evaluate_identifier(identifier: ast.Identifier, env: obj.Environment) -> obj.Obj:
+    val, found = env.get(identifier.value, NULL)
+    if not found:
+        return obj.Error.create("Identifier {0} not found", identifier.value)
+
+    return val
+
+
+def evaluate_program(program: ast.Program, env: obj.Environment):
     result = None
     for statement in program.statements:
-        result = evaluate(statement)
+        result = evaluate(statement, env)
 
         if type(result) == obj.ReturnValue:
             return_value: obj.ReturnValue = cast(obj.ReturnValue, result)
@@ -84,10 +104,12 @@ def evaluate_program(program: ast.Program):
     return result
 
 
-def evaluate_block_statement(block_statement: ast.BlockStatement):
+def evaluate_block_statement(
+    block_statement: ast.BlockStatement, env: obj.Environment
+):
     result = None
     for statement in block_statement.statements:
-        result = evaluate(statement)
+        result = evaluate(statement, env)
         if result != None:
             if result.type() in [obj.ObjType.RETURN, obj.ObjType.ERROR]:
                 return result
@@ -95,16 +117,16 @@ def evaluate_block_statement(block_statement: ast.BlockStatement):
     return result
 
 
-def eval_if_expression(if_exp: ast.IfExpression):
-    condition = evaluate(if_exp.condition)
+def eval_if_expression(if_exp: ast.IfExpression, env: obj.Environment):
+    condition = evaluate(if_exp.condition, env)
 
     if is_error(condition):
         return condition
 
     if is_truthy(condition):
-        return evaluate(if_exp.consequence)
+        return evaluate(if_exp.consequence, env)
     elif if_exp.alternative:
-        return evaluate(if_exp.alternative)
+        return evaluate(if_exp.alternative, env)
 
     return NULL
 
@@ -119,10 +141,10 @@ def is_truthy(obj: obj.Obj) -> bool:
     return True
 
 
-def evaluate_statements(statements):
+def evaluate_statements(statements, env: obj.Environment):
     result = None
     for statement in statements:
-        result = evaluate(statement)
+        result = evaluate(statement, env)
 
         if type(result) == obj.ReturnValue:
             return_value: obj.ReturnValue = cast(obj.ReturnValue, result)
@@ -137,7 +159,9 @@ def evaluate_prefix_expression(operator: str, right: obj.Obj) -> obj.Obj:
     if operator == "-":
         return evaluate_minus_operator_expression(right)
 
-    return obj.Error.create("Unknown operator {0}{0}", operator, right.inspect())
+    return obj.Error.create(
+        "Unknown operator {0}{0}", operator, right.inspect()
+    )
 
 
 def evaluate_not_operator_expression(right: obj.Obj) -> obj.Boolean:
@@ -152,7 +176,9 @@ def evaluate_not_operator_expression(right: obj.Obj) -> obj.Boolean:
 
 def evaluate_minus_operator_expression(right: obj.Obj) -> obj.Obj:
     if right.type() == obj.ObjType.BOOLEAN:
-        return obj.Error.create("Attempt to perform arithmetic on a boolean value")
+        return obj.Error.create(
+            "Attempt to perform arithmetic on a boolean value"
+        )
 
     if type(right) != obj.Integer:
         return NULL
@@ -169,14 +195,18 @@ def evaluate_infix_expression(
         right_val = cast(obj.Integer, right)
         return evaluate_infix_integer_expression(operator, left_val, right_val)
 
-    if (
-        obj.ObjType.BOOLEAN in [left.type(), right.type()]
-        and operator in ["+", "-", "*", "/"]
-    ):
-        return obj.Error.create("Attempt to perform arithmetic on a boolean value")
+    if obj.ObjType.BOOLEAN in [left.type(), right.type()] and operator in [
+        "+",
+        "-",
+        "*",
+        "/",
+    ]:
+        return obj.Error.create(
+            "Attempt to perform arithmetic on a boolean value"
+        )
 
     # if left.type() != right.type():
-        # return obj.Error.create("Type mismatch")
+    # return obj.Error.create("Type mismatch")
 
     if operator == "==":
         return native_bool_to_bool_obj(left == right)

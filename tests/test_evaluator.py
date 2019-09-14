@@ -149,6 +149,7 @@ true + false
                 "if true + false then 1 else 2 end",
                 "Attempt to perform arithmetic on a boolean value"
             ),
+            ("foobar", "Identifier foobar not found"),  # TODO: lua returns nil
         ]
 
         for source, expected in tests:
@@ -157,9 +158,32 @@ true + false
             self.assertEqual(type(evaluated), obj.Error)
             self.assertEqual(evaluated.message, expected)
 
+    def test_assignments(self):
+        tests = [
+            ("""a = 5
+a""", 5),
+            ("""a = 5 * 5
+a""", 25),
+            ("""a = 5
+b = a
+b""", 5),
+
+            ("""a = 5
+b = a
+c = a + b
+c""", 10),
+        ]
+
+        for source, expected in tests:
+            evaluated = source_to_eval(source)
+
+            self.assertEqual(type(evaluated), obj.Integer)
+            self.assertEqual(evaluated.value, expected)
+
 
 def source_to_eval(source) -> obj.Obj:
     lexer = Lexer(StringIO(source))
     parser = Parser(lexer)
     program = parser.parse_program()
-    return evaluator.evaluate(program)
+    env = obj.Environment()
+    return evaluator.evaluate(program, env)

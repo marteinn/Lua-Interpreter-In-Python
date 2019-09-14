@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Any, Dict, Tuple
 
 from enum import Enum, auto
 
@@ -85,3 +86,19 @@ class Error(Obj):
 
     def inspect(self) -> str:
         return "ERROR: {}".format(self.message)
+
+
+class Environment:
+    def __init__(self):
+        self.store: Dict[str, Obj] = {}
+
+    def get(self, name: str, default: Obj) -> Tuple[Obj, bool]:
+        val = self.store.get(name, default)
+        return (val, self.contains(name))
+
+    def contains(self, name: str) -> bool:
+        return name in self.store
+
+    def set(self, name: str, value: Obj) -> Obj:
+        self.store[name] = value
+        return value
