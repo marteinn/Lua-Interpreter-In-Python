@@ -56,6 +56,11 @@ class Lexer:
             self.read_char()
             return tok
 
+        if self.ch == ";":
+            tok = Token(token_type=TokenType.SEMICOLON, literal=self.ch)
+            self.read_char()
+            return tok
+
         if self.ch == "(":
             tok = Token(token_type=TokenType.LPAREN, literal=self.ch)
             self.read_char()

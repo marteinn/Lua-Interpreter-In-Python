@@ -90,7 +90,10 @@ class Parser:
     def parse_program(self) -> ast.Program:
         statements = []
         while self.cur_token.token_type != TokenType.EOF:
-            if self.cur_token.token_type == TokenType.NEWLINE:
+            if self.cur_token.token_type in [
+                TokenType.NEWLINE,
+                TokenType.SEMICOLON,
+            ]:
                 self.next_token()
                 continue
 
@@ -120,7 +123,10 @@ class Parser:
 
         value = self.parse_expression(Precedence.LOWEST)
 
-        if self.peek_token.token_type == TokenType.NEWLINE:
+        if self.peek_token.token_type in [
+            TokenType.NEWLINE,
+            TokenType.SEMICOLON,
+        ]:
             self.next_token()
 
         statement = ast.AssignStatement(
@@ -199,7 +205,8 @@ class Parser:
         left_expression = prefix_fn()
 
         while (
-            self.peek_token.token_type != TokenType.NEWLINE
+            self.peek_token.token_type
+            not in [TokenType.NEWLINE, TokenType.SEMICOLON]
             and precedence < self.peek_precedence()
         ):
             infix_fn = self.infix_parse_fns.get(

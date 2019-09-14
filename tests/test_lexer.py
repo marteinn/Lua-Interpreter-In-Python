@@ -207,3 +207,20 @@ a = false
 
             self.assertEqual(expected_token[0], token.token_type)
             self.assertEqual(expected_token[1], token.literal)
+
+    def test_semicolon_delimiter(self):
+        source = "1; 2"
+        lexer = Lexer(StringIO(source))
+
+        tokens = [
+            (TokenType.INT, "1"),
+            (TokenType.SEMICOLON, ";"),
+            (TokenType.INT, "2"),
+            (TokenType.EOF, "<<EOF>>"),
+        ]
+
+        for expected_token in tokens:
+            token = lexer.next_token()
+
+            self.assertEqual(expected_token[0], token.token_type)
+            self.assertEqual(expected_token[1], token.literal)

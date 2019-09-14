@@ -77,6 +77,17 @@ class ParserTest(unittest.TestCase):
                 expected,
             )
 
+    def test_semicolon_delimiter(self):
+        tests = (
+            ("1; b", 2),
+            ("a = 1; b = 2;", 2),
+            ("1 + 2; 3 + 3;d = 5; 5 * 5", 4),
+        )
+
+        for source, expected in tests:
+            program = program_from_source(source)
+            self.assertEqual(len(program.statements), expected)
+
     def test_integer_literal(self):
         program = program_from_source("1")
 
