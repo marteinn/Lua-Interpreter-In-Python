@@ -2,11 +2,9 @@ from typing import cast, Optional, List
 
 from . import ast
 from . import obj
+from .builtins import builtins
 
-
-TRUE = obj.Boolean(value=True)
-FALSE = obj.Boolean(value=False)
-NULL = obj.Null()
+from .obj import TRUE, FALSE, NULL
 
 
 def evaluate(node: ast.Node, env: obj.Environment):
@@ -107,11 +105,19 @@ def evaluate(node: ast.Node, env: obj.Environment):
 
 
 def apply_function(
-    fn: obj.Function, args: List[obj.Obj], env: obj.Environment
+    fn: obj.Obj, args: List[obj.Obj], env: obj.Environment
 ) -> obj.Obj:
-    extended_env = extend_function_env(fn, args)
-    evaluated = evaluate(fn.body, extended_env)
-    return unwrap_return_value(evaluated)
+    if type(fn) == obj.Function:
+        fn_fn = cast(obj.Function, fn)
+        extended_env = extend_function_env(fn_fn, args)
+        evaluated = evaluate(fn_fn.body, extended_env)
+        return unwrap_return_value(evaluated)
+
+    if type(fn) == obj.Builtin:
+        builtin_fn = cast(obj.Builtin, fn)
+        return builtin_fn.fn(*args)
+
+    return obj.Error.create("Not a function {0}", fn.type())
 
 
 def unwrap_return_value(value: obj.Obj) -> obj.Obj:
@@ -151,10 +157,13 @@ def evaluate_identifier(
     identifier: ast.Identifier, env: obj.Environment
 ) -> obj.Obj:
     val, found = env.get(identifier.value, NULL)
-    if not found:
-        return obj.Error.create("Identifier {0} not found", identifier.value)
+    if found:
+        return val
 
-    return val
+    if identifier.value in builtins:
+        return builtins[identifier.value]
+
+    return obj.Error.create("Identifier {0} not found", identifier.value)
 
 
 def evaluate_program(program: ast.Program, env: obj.Environment):

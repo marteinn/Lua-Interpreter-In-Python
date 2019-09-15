@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
-from typing import Any, Dict, Tuple, List, Optional
+from typing import Any, Dict, Tuple, List, Optional, Callable
+from mypy_extensions import (VarArg)
 from enum import Enum, auto
 
 from luatopy import ast
@@ -14,6 +15,7 @@ class ObjType(Enum):
     ERROR = auto()
     FUNCTION = auto()
     STRING = auto()
+    BUILTIN = auto()
 
 
 class Obj:
@@ -151,3 +153,19 @@ class String(Obj):
 
     def inspect(self) -> str:
         return self.value
+
+
+@dataclass
+class Builtin(Obj):
+    fn: Callable[[VarArg(Obj)], Obj]
+
+    def type(self) -> ObjType:
+        return ObjType.BUILTIN
+
+    def inspect(self) -> str:
+        return "Builtin function"
+
+
+TRUE = Boolean(value=True)
+FALSE = Boolean(value=False)
+NULL = Null()

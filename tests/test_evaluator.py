@@ -239,6 +239,17 @@ add_two(3)
             evaluated = source_to_eval(source)
             self.assertEqual(evaluated.value, expected)
 
+    def test_builints(self):
+        tests = [
+            ('type("string")', "string"),
+            ('type(1)', "number"),
+            ('type(true)', "boolean"),
+        ]
+
+        for source, expected in tests:
+            evaluated = source_to_eval(source)
+            self.assertEqual(evaluated.value, expected)
+
 
 def source_to_eval(source) -> obj.Obj:
     lexer = Lexer(StringIO(source))
