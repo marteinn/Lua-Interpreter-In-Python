@@ -85,7 +85,7 @@ class StringLiteral(Node):
     value: str
 
     def to_code(self) -> str:
-        return self.value
+        return '"{0}"'.format(self.value)
 
 
 @dataclass

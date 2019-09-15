@@ -40,6 +40,17 @@ class ParserTest(unittest.TestCase):
                 expected,
             )
 
+    def test_string_influx_parsing(self):
+        tests = (
+            ('"hello " .. "world"', '("hello " .. "world")'),
+        )
+
+        for source, expected in tests:
+            self.assertEqual(
+                program_from_source(source).to_code(),
+                expected,
+            )
+
     def test_operator_precedence(self):
         tests = (
             ("1 + 2", "(1 + 2)"),

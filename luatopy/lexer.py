@@ -115,7 +115,7 @@ class Lexer:
                 self.read_char()
                 literal = literal + self.ch
                 self.read_char()
-                tok = Token(token_type=TokenType.ADD, literal=literal)
+                tok = Token(token_type=TokenType.CONCAT, literal=literal)
                 return tok
 
         if self.ch == "~":

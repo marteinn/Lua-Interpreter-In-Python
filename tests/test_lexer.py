@@ -94,7 +94,7 @@ stra .. strb
             (TokenType.NEWLINE, "\n"),
             (TokenType.IDENTIFIER, "a"), (TokenType.NOT_EQ, "~="), (TokenType.IDENTIFIER, "b"),
             (TokenType.NEWLINE, "\n"),
-            (TokenType.IDENTIFIER, "stra"), (TokenType.ADD, ".."), (TokenType.IDENTIFIER, "strb"),
+            (TokenType.IDENTIFIER, "stra"), (TokenType.CONCAT, ".."), (TokenType.IDENTIFIER, "strb"),
             (TokenType.NEWLINE, "\n"),
             (TokenType.INT, "1"), (TokenType.GT, ">"), (TokenType.INT, "2"),
             (TokenType.NEWLINE, "\n"),

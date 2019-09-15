@@ -40,7 +40,7 @@ class TokenType(Enum):
     RPAREN = auto()
 
     COMMA = auto()
-    ADD = auto()
+    CONCAT = auto()
 
     # Keywords
     FUNCTION = auto()

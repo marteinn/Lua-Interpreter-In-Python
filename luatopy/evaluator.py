@@ -262,6 +262,13 @@ def evaluate_infix_expression(
         right_val = cast(obj.Integer, right)
         return evaluate_infix_integer_expression(operator, left_val, right_val)
 
+    if type(left) == obj.String and type(right) == obj.String:
+        left_str_val = cast(obj.String, left)
+        right_str_val = cast(obj.String, right)
+        return evaluate_infix_string_expression(
+            operator, left_str_val, right_str_val
+        )
+
     if obj.ObjType.BOOLEAN in [left.type(), right.type()] and operator in [
         "+",
         "-",
@@ -282,6 +289,14 @@ def evaluate_infix_expression(
         return native_bool_to_bool_obj(left != right)
 
     return obj.Error.create("Unknown infix operator {0}", operator)
+
+
+def evaluate_infix_string_expression(
+    operator, left: obj.String, right: obj.String
+) -> obj.Obj:
+    if operator == "..":
+        return obj.String(left.value + right.value)
+    return NULL
 
 
 def evaluate_infix_integer_expression(

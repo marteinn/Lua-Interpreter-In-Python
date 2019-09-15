@@ -150,4 +150,4 @@ class String(Obj):
         return ObjType.STRING
 
     def inspect(self) -> str:
-        return '"{0}"'.format(self.value)
+        return self.value

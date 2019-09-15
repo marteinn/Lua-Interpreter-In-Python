@@ -22,10 +22,11 @@ class Precedence(IntEnum):
     LOWEST = 0
     EQUALS = 1
     LESSGREATER = 2
-    SUM = 3
-    PRODUCT = 4
-    PREFIX = 5
-    CALL = 6
+    CONCAT = 3
+    SUM = 4
+    PRODUCT = 5
+    PREFIX = 6
+    CALL = 7
 
 
 precedences: Dict[TokenType, Precedence] = {
@@ -41,6 +42,7 @@ precedences: Dict[TokenType, Precedence] = {
     TokenType.LTE: Precedence.LESSGREATER,
     TokenType.LPAREN: Precedence.CALL,
     TokenType.IF: Precedence.CALL,
+    TokenType.CONCAT: Precedence.CONCAT,
 }
 
 
@@ -76,6 +78,7 @@ class Parser:
             TokenType.LT: self.parse_infix_expression,
             TokenType.LTE: self.parse_infix_expression,
             TokenType.LPAREN: self.parse_call_expression,
+            TokenType.CONCAT: self.parse_infix_expression,
         }
 
         self.cur_token: Token = self.lexer.next_token()

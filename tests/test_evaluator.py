@@ -37,6 +37,18 @@ class EvaluatorTest(unittest.TestCase):
             self.assertEqual(type(evaluated), obj.Float)
             self.assertEqual(evaluated.value, expected)
 
+    def test_string_concat(self):
+        tests = [
+            ('"hello" .. "world"', "helloworld"),
+            ('"hello" .. "-" .. "world"', "hello-world"),
+        ]
+
+        for source, expected in tests:
+            evaluated = source_to_eval(source)
+
+            self.assertEqual(type(evaluated), obj.String)
+            self.assertEqual(evaluated.value, expected)
+
     def test_boolean_expressions(self):
         tests = [
             ("false", False),
