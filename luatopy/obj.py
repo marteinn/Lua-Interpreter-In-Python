@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Any, Dict, Tuple, List, Optional, Callable
-from mypy_extensions import (VarArg)
+from mypy_extensions import VarArg
 from enum import Enum, auto
 
 from luatopy import ast

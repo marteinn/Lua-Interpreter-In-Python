@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, List
 
 from . import obj
 from .obj import TRUE, FALSE, NULL
@@ -31,3 +31,12 @@ def builtin_type(*args: obj.Obj) -> obj.Obj:
 
 
 builtins = register(builtins, "type", builtin_type)
+
+
+def builtin_print(*args: obj.Obj) -> obj.Obj:
+    out: List[str] = [x.inspect() for x in args]
+    # TODO: Add a way to detect stdout and how to write
+    return obj.String(value="   ".join(out))
+
+
+builtins = register(builtins, "print", builtin_print)
