@@ -10,6 +10,7 @@ class TokenType(Enum):
 
     IDENTIFIER = auto()
     INT = auto()
+    STR = auto()
     NIL = auto()
     TRUE = auto()
     FALSE = auto()

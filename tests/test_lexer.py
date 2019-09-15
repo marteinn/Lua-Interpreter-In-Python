@@ -224,3 +224,29 @@ a = false
 
             self.assertEqual(expected_token[0], token.token_type)
             self.assertEqual(expected_token[1], token.literal)
+
+    def test_string_type(self):
+        source = """"a random string"
+"escape\\" value"
+'another string'
+'with escaped\\' indicator'
+"""
+        lexer = Lexer(StringIO(source))
+
+        tokens = [
+            (TokenType.STR, "a random string"),
+            (TokenType.NEWLINE, "\n"),
+            (TokenType.STR, 'escape" value'),
+            (TokenType.NEWLINE, "\n"),
+            (TokenType.STR, "another string"),
+            (TokenType.NEWLINE, "\n"),
+            (TokenType.STR, "with escaped' indicator"),
+            (TokenType.NEWLINE, "\n"),
+            (TokenType.EOF, "<<EOF>>"),
+        ]
+
+        for expected_token in tokens:
+            token = lexer.next_token()
+
+            self.assertEqual(expected_token[0], token.token_type)
+            self.assertEqual(expected_token[1], token.literal)

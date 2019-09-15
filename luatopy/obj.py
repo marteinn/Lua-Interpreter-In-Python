@@ -13,6 +13,7 @@ class ObjType(Enum):
     RETURN = auto()
     ERROR = auto()
     FUNCTION = auto()
+    STRING = auto()
 
 
 class Obj:
@@ -139,3 +140,14 @@ class Function(Obj):
         out = out + self.body.to_code()
         out = out + "\nend"
         return out
+
+
+@dataclass
+class String(Obj):
+    value: str = ""
+
+    def type(self) -> ObjType:
+        return ObjType.STRING
+
+    def inspect(self) -> str:
+        return '"{0}"'.format(self.value)

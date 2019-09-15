@@ -218,6 +218,15 @@ add_two(3)
         evaluated = source_to_eval(source)
         self.assertEqual(evaluated.value, 5)
 
+    def test_string_expressions(self):
+        tests = [
+            ('"hello world"', 'hello world'),
+        ]
+
+        for source, expected in tests:
+            evaluated = source_to_eval(source)
+            self.assertEqual(evaluated.value, expected)
+
 
 def source_to_eval(source) -> obj.Obj:
     lexer = Lexer(StringIO(source))

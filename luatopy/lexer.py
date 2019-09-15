@@ -31,6 +31,11 @@ class Lexer:
             return EOF_MARKER
         return self.source[self.read_pos + steps]
 
+    def peek_behind(self, steps: int = 0) -> str:
+        if self.read_pos - steps >= len(self.source):
+            return EOF_MARKER
+        return self.source[self.read_pos - steps]
+
     def skip_whitespace(self) -> None:
         while self.ch == " ":
             self.read_char()
@@ -215,6 +220,14 @@ class Lexer:
             value = self.read_number()
             return Token(token_type=TokenType.INT, literal=value)
 
+        if self.ch == '"':
+            value = self.read_string('"')
+            return Token(token_type=TokenType.STR, literal=value)
+
+        if self.ch == "'":
+            value = self.read_string("'")
+            return Token(token_type=TokenType.STR, literal=value)
+
         tok = Token(token_type=TokenType.ILLEGAL, literal=self.ch)
         self.read_char()
         return tok
@@ -230,6 +243,28 @@ class Lexer:
         while self.ch != EOF_MARKER and is_digit(self.ch):
             self.read_char()
         return self.source[start_position : self.pos]
+
+    def read_string(self, indicator: str = '"') -> str:
+        self.read_char()
+
+        start_position = self.pos
+        out: str = self.ch
+
+        while True:
+            self.read_char()
+
+            if self.ch == "\\" and self.peek_ahead(0) == indicator:
+                self.read_char()
+                out += indicator
+                continue
+
+            if self.ch == indicator or self.ch == EOF_MARKER:
+                break
+
+            out = out + self.ch
+
+        self.read_char()
+        return out
 
     def read_comment(self) -> str:
         start_position = self.pos

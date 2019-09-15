@@ -52,6 +52,7 @@ class Parser:
         self.prefix_parse_fns: Dict[TokenType, Callable] = {
             TokenType.IDENTIFIER: self.parse_identifier,
             TokenType.INT: self.parse_integer_literal,
+            TokenType.STR: self.parse_string_literal,
             TokenType.MINUS: self.parse_prefix_expression,
             TokenType.TRUE: self.parse_boolean_literal,
             TokenType.FALSE: self.parse_boolean_literal,
@@ -228,6 +229,11 @@ class Parser:
         literal = self.cur_token.literal
         value = int(literal)
         return ast.IntegerLiteral(token=self.cur_token, value=value)
+
+    def parse_string_literal(self) -> ast.StringLiteral:
+        literal = self.cur_token.literal
+        value = literal
+        return ast.StringLiteral(token=self.cur_token, value=value)
 
     def parse_boolean_literal(self) -> ast.Boolean:
         literal = self.cur_token.literal

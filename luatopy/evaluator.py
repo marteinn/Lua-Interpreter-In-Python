@@ -24,6 +24,10 @@ def evaluate(node: ast.Node, env: obj.Environment):
         integer_literal: ast.IntegerLiteral = cast(ast.IntegerLiteral, node)
         return obj.Integer(value=integer_literal.value)
 
+    if klass == ast.StringLiteral:
+        string_literal: ast.StringLiteral = cast(ast.StringLiteral, node)
+        return obj.String(value=string_literal.value)
+
     if klass == ast.Boolean:
         boolean: ast.Boolean = cast(ast.Boolean, node)
         return native_bool_to_bool_obj(boolean.value)

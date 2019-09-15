@@ -81,6 +81,14 @@ class IntegerLiteral(Node):
 
 
 @dataclass
+class StringLiteral(Node):
+    value: str
+
+    def to_code(self) -> str:
+        return self.value
+
+
+@dataclass
 class PrefixExpression(Expression):
     right: Node
     operator: str

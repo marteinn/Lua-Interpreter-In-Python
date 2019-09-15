@@ -223,6 +223,13 @@ class ParserTest(unittest.TestCase):
                 expected,
             )
 
+    def test_string_literal(self):
+        program = program_from_source('"hello world"')
+
+        statement = program.statements[0]
+        self.assertIs(type(statement), ast.ExpressionStatement)
+        self.assertIs(type(statement.expression), ast.StringLiteral)
+
 
 def program_from_source(source):
     lexer = Lexer(StringIO(source))
