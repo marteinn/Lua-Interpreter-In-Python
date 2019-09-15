@@ -183,7 +183,10 @@ c""", 10),
 
     def test_function_declaration(self):
         tests = [
-            ("function (a) a + 1 end", "function (a) (a + 1) end"),
+            (
+                "function (a) a = a + 1; return a end",
+                "function (a)\na = (a + 1)\nreturn a\nend"
+            ),
         ]
 
         for source, expected in tests:
@@ -191,6 +194,29 @@ c""", 10),
 
             self.assertEqual(type(evaluated), obj.Function)
             self.assertEqual(evaluated.inspect(), expected)
+
+    def test_function_call(self):
+        tests = [
+            ("f = function (a) a + 1 end; f(1)", 2),
+            ("f = function (a) return a end; f(1)", 1),
+            ("f = function (a, b) return a+b end; f(1, 2)", 3),
+            ("(function (x) return x end)(5)", 5),
+        ]
+
+        for source, expected in tests:
+            evaluated = source_to_eval(source)
+            self.assertEqual(evaluated.value, expected)
+
+
+    def test_function_closure(self):
+        source = """
+add = function (x) function (y) x + y end end
+add_two = add(2)
+add_two(3)
+"""
+
+        evaluated = source_to_eval(source)
+        self.assertEqual(evaluated.value, 5)
 
 
 def source_to_eval(source) -> obj.Obj:

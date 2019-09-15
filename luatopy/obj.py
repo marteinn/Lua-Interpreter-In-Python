@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, Dict, Tuple, List
+from typing import Any, Dict, Tuple, List, Optional
 from enum import Enum, auto
 
 from luatopy import ast
@@ -24,12 +24,18 @@ class Obj:
 
 
 class Environment:
-    def __init__(self):
+    def __init__(self, outer: Optional["Environment"] = None):
         self.store: Dict[str, Obj] = {}
+        self.outer: Optional["Environment"] = outer
 
     def get(self, name: str, default: Obj) -> Tuple[Obj, bool]:
         val = self.store.get(name, default)
-        return (val, self.contains(name))
+        found = self.contains(name)
+
+        if not found and self.outer:
+            return self.outer.get(name, default)
+
+        return (val, found)
 
     def contains(self, name: str) -> bool:
         return name in self.store
@@ -37,6 +43,16 @@ class Environment:
     def set(self, name: str, value: Obj) -> Obj:
         self.store[name] = value
         return value
+
+    def __str__(self):
+        combined = self.store
+        if self.outer:
+            combined = {**self.outer.store, **self.store}
+        return str(combined)
+
+    @staticmethod
+    def create_enclosed(outer: "Environment") -> "Environment":
+        return Environment(outer=outer)
 
 
 @dataclass
@@ -119,7 +135,7 @@ class Function(Obj):
         out: str = ""
         signature = ", ".join([x.value for x in self.parameters])
 
-        out = "function ({0}) ".format(signature)
+        out = "function ({0})\n".format(signature)
         out = out + self.body.to_code()
-        out = out + " end"
+        out = out + "\nend"
         return out

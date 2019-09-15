@@ -1,4 +1,4 @@
-from typing import cast, Optional
+from typing import cast, Optional, List
 
 from . import ast
 from . import obj
@@ -85,7 +85,62 @@ def evaluate(node: ast.Node, env: obj.Environment):
             body=fn_literal.body, parameters=fn_literal.parameters, env=env
         )
 
+    if klass == ast.CallExpression:
+        call_exp: ast.CallExpression = cast(ast.CallExpression, node)
+        fn_obj: obj.Obj = evaluate(call_exp.function, env)
+
+        if is_error(fn_obj):
+            return fn_obj
+
+        fn: obj.Function = cast(obj.Function, fn_obj)
+        args: List[obj.Obj] = evaluate_expressions(call_exp.arguments, env)
+        if len(args) > 1 and is_error(args[0]):
+            return args[0]
+
+        return apply_function(fn, args, env)
+
     return None
+
+
+def apply_function(
+    fn: obj.Function, args: List[obj.Obj], env: obj.Environment
+) -> obj.Obj:
+    extended_env = extend_function_env(fn, args)
+    evaluated = evaluate(fn.body, extended_env)
+    return unwrap_return_value(evaluated)
+
+
+def unwrap_return_value(value: obj.Obj) -> obj.Obj:
+    if type(value) == obj.ReturnValue:
+        return_value = cast(obj.ReturnValue, value)
+        return return_value.value
+    return value
+
+
+def extend_function_env(
+    fn: obj.Function, args: List[obj.Obj]
+) -> obj.Environment:
+    enclosed_env = obj.Environment.create_enclosed(fn.env)
+
+    param: ast.Identifier
+    for index, param in enumerate(fn.parameters):
+        enclosed_env.set(param.value, args[index])
+    return enclosed_env
+
+
+def evaluate_expressions(
+    expressions: List[ast.Expression], env: obj.Environment
+) -> List[obj.Obj]:
+    result: List[obj.Obj] = []
+
+    for exp in expressions:
+        evaluated: obj.Obj = evaluate(exp, env)
+        if is_error(evaluated):
+            return [evaluated]
+
+        result.append(evaluated)
+
+    return result
 
 
 def evaluate_identifier(
