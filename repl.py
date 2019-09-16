@@ -21,7 +21,7 @@ def run(tokens, ast_code):
 
     env = Environment()
     while True:
-        source = input(">>> ")
+        source = input("> ")
         lexer = Lexer(StringIO(source))
         if tokens:
             print(list(lexer.tokens()))

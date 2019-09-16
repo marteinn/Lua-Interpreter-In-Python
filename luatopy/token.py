@@ -39,6 +39,12 @@ class TokenType(Enum):
     LPAREN = auto()
     RPAREN = auto()
 
+    LBRACKET = auto()
+    RBRACKET = auto()
+
+    LBRACE = auto()
+    RBRACE = auto()
+
     COMMA = auto()
     CONCAT = auto()
 

@@ -72,6 +72,7 @@ def evaluate(node: ast.Node, env: obj.Environment):
     if klass == ast.AssignStatement:
         assignment: ast.AssignStatement = cast(ast.AssignStatement, node)
         assignment_value: obj.Obj = evaluate(assignment.value, env)
+
         if is_error(assignment_value):
             return assignment_value
         env.set(assignment.name.value, assignment_value)
@@ -101,7 +102,46 @@ def evaluate(node: ast.Node, env: obj.Environment):
 
         return apply_function(fn, args, env)
 
+    if klass == ast.TableLiteral:
+        table_literal: ast.TableLiteral = cast(ast.TableLiteral, node)
+        elements = evaluate_expressions(table_literal.elements, env)
+        if len(elements) == 1 and is_error(elements[0]):
+            return elements[0]
+
+        return obj.Table(elements=elements)
+
+    if klass == ast.IndexExpression:
+        index_expression: ast.IndexExpression = cast(ast.IndexExpression, node)
+        left: obj.Obj = evaluate(index_expression.left, env)
+        if is_error(left):
+            return left
+
+        index: obj.Obj = evaluate(index_expression.index, env)
+        if is_error(index):
+            return index
+
+        return evaluate_index_expression(left, index)
+
     return None
+
+
+def evaluate_index_expression(left: obj.Obj, index: obj.Obj) -> obj.Obj:
+    if left.type() == obj.ObjType.TABLE and index.type() == obj.ObjType.INTEGER:
+        return evaluate_table_index_expression(
+            cast(obj.Table, left), cast(obj.Integer, index)
+        )
+
+    return obj.Error.create("Index operation not supported")
+
+
+def evaluate_table_index_expression(
+    table: obj.Table, index: obj.Integer
+) -> obj.Obj:
+    index_value: int = index.value
+    try:
+        return table.elements[index_value - 1]
+    except:
+        return NULL
 
 
 def apply_function(

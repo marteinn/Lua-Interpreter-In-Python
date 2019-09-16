@@ -16,6 +16,7 @@ class ObjType(Enum):
     FUNCTION = auto()
     STRING = auto()
     BUILTIN = auto()
+    TABLE = auto()
 
 
 class Obj:
@@ -164,6 +165,19 @@ class Builtin(Obj):
 
     def inspect(self) -> str:
         return "Builtin function"
+
+
+@dataclass
+class Table(Obj):
+    elements: List[Obj]
+
+    def type(self) -> ObjType:
+        return ObjType.TABLE
+
+    def inspect(self) -> str:
+        out: str = ""
+        signature = ", ".join([x.inspect() for x in self.elements])
+        return "{{{0}}}".format(signature)
 
 
 TRUE = Boolean(value=True)

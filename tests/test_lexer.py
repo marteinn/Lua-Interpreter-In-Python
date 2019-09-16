@@ -250,3 +250,23 @@ a = false
 
             self.assertEqual(expected_token[0], token.token_type)
             self.assertEqual(expected_token[1], token.literal)
+
+    def test_table_list_declaration(self):
+        source = "{1, 2}"
+
+        lexer = Lexer(StringIO(source))
+
+        tokens = [
+            (TokenType.LBRACE, "{"),
+            (TokenType.INT, "1"),
+            (TokenType.COMMA, ","),
+            (TokenType.INT, "2"),
+            (TokenType.RBRACE, "}"),
+            (TokenType.EOF, "<<EOF>>"),
+        ]
+
+        for expected_token in tokens:
+            token = lexer.next_token()
+
+            self.assertEqual(expected_token[0], token.token_type)
+            self.assertEqual(expected_token[1], token.literal)

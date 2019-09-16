@@ -1,4 +1,4 @@
-from typing import Optional, Dict, Callable, List
+from typing import Optional, Dict, Callable, List, cast
 from enum import IntEnum, auto
 
 from .token import TokenType, Token
@@ -27,6 +27,7 @@ class Precedence(IntEnum):
     PRODUCT = 5
     PREFIX = 6
     CALL = 7
+    INDEX = 8
 
 
 precedences: Dict[TokenType, Precedence] = {
@@ -43,6 +44,7 @@ precedences: Dict[TokenType, Precedence] = {
     TokenType.LPAREN: Precedence.CALL,
     TokenType.IF: Precedence.CALL,
     TokenType.CONCAT: Precedence.CONCAT,
+    TokenType.LBRACKET: Precedence.INDEX,
 }
 
 
@@ -62,6 +64,7 @@ class Parser:
             TokenType.IF: self.parse_if_expression,
             TokenType.FUNCTION: self.parse_function_literal,
             TokenType.NOT: self.parse_prefix_expression,
+            TokenType.LBRACE: self.parse_table_literal,
         }
 
         self.infix_parse_fns: Dict[
@@ -79,6 +82,7 @@ class Parser:
             TokenType.LTE: self.parse_infix_expression,
             TokenType.LPAREN: self.parse_call_expression,
             TokenType.CONCAT: self.parse_infix_expression,
+            TokenType.LBRACKET: self.parse_index_expression,
         }
 
         self.cur_token: Token = self.lexer.next_token()
@@ -318,7 +322,7 @@ class Parser:
             token=token, left=left, operator=token.literal, right=right
         )
 
-    def parse_call_expression(self, function: ast.Node):
+    def parse_call_expression(self, function: ast.Node) -> ast.CallExpression:
         token = self.cur_token
         arguments = self.parse_call_arguments()
 
@@ -372,3 +376,48 @@ class Parser:
 
         self.next_token()
         return True
+
+    def parse_table_literal(self) -> ast.TableLiteral:
+        token = self.cur_token
+
+        elements = self.parse_expression_list()
+
+        return ast.TableLiteral(token=token, elements=elements)
+
+    def parse_expression_list(self):
+        expressions: List[ast.Expression] = []
+
+        if self.peek_token.token_type == TokenType.RBRACE:
+            self.next_token()
+            return expressions
+
+        self.next_token()
+
+        expression = self.parse_expression(Precedence.LOWEST)
+        expressions.append(expression)
+
+        while self.peek_token.token_type == TokenType.COMMA:
+            self.next_token()
+            self.next_token()
+
+            expression = self.parse_expression(Precedence.LOWEST)
+            expressions.append(expression)
+
+        if not self.expect_peek(TokenType.RBRACE):
+            return None
+
+        return expressions
+
+    def parse_index_expression(self, left: ast.Node):
+        left_expression = cast(ast.Expression, left)
+        token = self.cur_token
+
+        self.next_token()
+        index = self.parse_expression(Precedence.LOWEST)
+
+        if not self.expect_peek(TokenType.RBRACKET):
+            return None
+
+        return ast.IndexExpression(
+            token=token, left=left_expression, index=index
+        )

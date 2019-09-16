@@ -19,6 +19,7 @@ This is my second take on writing a Lua-To-Python compiler, it includes:
 - [x] Introduce `;` as a separator
 - [ ] Named functions
 - [ ] Not defined variables should return `nil`
+- [ ] Handle global vs local variables in lua style
 
 
 ## References

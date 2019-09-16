@@ -172,18 +172,10 @@ true + false
 
     def test_assignments(self):
         tests = [
-            ("""a = 5
-a""", 5),
-            ("""a = 5 * 5
-a""", 25),
-            ("""a = 5
-b = a
-b""", 5),
-
-            ("""a = 5
-b = a
-c = a + b
-c""", 10),
+            ("""a = 5; a""", 5),
+            ("""a = 5 * 5; a""", 25),
+            ("""a = 5; b = a; b""", 5),
+            ("""a = 5; b = a; c = a + b; c""", 10),
         ]
 
         for source, expected in tests:
@@ -249,6 +241,27 @@ add_two(3)
         for source, expected in tests:
             evaluated = source_to_eval(source)
             self.assertEqual(evaluated.value, expected)
+
+    def test_table_expressions(self):
+        tests = [
+            ("{1, 2, (1 + 2)}", "{1, 2, 3}"),
+            ("a = {1, 2, 3}; a", "{1, 2, 3}"),
+            ('{1, "random", 3}', '{1, random, 3}'),
+        ]
+
+        for source, expected in tests:
+            evaluated = source_to_eval(source)
+            self.assertEqual(evaluated.inspect(), expected)
+
+    def test_table_index_expressions(self):
+        tests = [
+            ("{1, 2, 3}[1]", "1"),
+            ("{1, 2, 3}[99]", "nil"),
+        ]
+
+        for source, expected in tests:
+            evaluated = source_to_eval(source)
+            self.assertEqual(evaluated.inspect(), expected)
 
 
 def source_to_eval(source) -> obj.Obj:

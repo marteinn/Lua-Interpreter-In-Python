@@ -76,6 +76,26 @@ class Lexer:
             self.read_char()
             return tok
 
+        if self.ch == "{":
+            tok = Token(token_type=TokenType.LBRACE, literal=self.ch)
+            self.read_char()
+            return tok
+
+        if self.ch == "}":
+            tok = Token(token_type=TokenType.RBRACE, literal=self.ch)
+            self.read_char()
+            return tok
+
+        if self.ch == "[":
+            tok = Token(token_type=TokenType.LBRACKET, literal=self.ch)
+            self.read_char()
+            return tok
+
+        if self.ch == "]":
+            tok = Token(token_type=TokenType.RBRACKET, literal=self.ch)
+            self.read_char()
+            return tok
+
         if self.ch == ",":
             tok = Token(token_type=TokenType.COMMA, literal=self.ch)
             self.read_char()

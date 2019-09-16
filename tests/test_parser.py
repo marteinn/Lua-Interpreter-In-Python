@@ -66,7 +66,7 @@ class ParserTest(unittest.TestCase):
             ("b ~= true", "(b ~= true)"),
             ("a+b(c*d)+e", "((a + b((c * d))) + e)"),
             ("add(a + b * c + d / e - f)", "add((((a + (b * c)) + (d / e)) - f))"),
-
+            ("a * {1, 2}[b * c] * d", "((a * ({1, 2}[(b * c)])) * d)"),
         )
 
         for source, expected in tests:
@@ -240,6 +240,21 @@ class ParserTest(unittest.TestCase):
         statement = program.statements[0]
         self.assertIs(type(statement), ast.ExpressionStatement)
         self.assertIs(type(statement.expression), ast.StringLiteral)
+
+    def test_table_literal(self):
+        program = program_from_source('{1, 2, "hello"}')
+
+        statement = program.statements[0]
+        self.assertIs(type(statement), ast.ExpressionStatement)
+        self.assertIs(type(statement.expression), ast.TableLiteral)
+
+    def test_parsing_index_expressions(self):
+        program = program_from_source("values[1]")
+
+        statement = program.statements[0]
+        self.assertIs(type(statement), ast.ExpressionStatement)
+        self.assertIs(type(statement.expression), ast.IndexExpression)
+        self.assertIs(statement.expression.index.value, 1)
 
 
 def program_from_source(source):

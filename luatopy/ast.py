@@ -168,3 +168,21 @@ class CallExpression(Expression):
             ", ".join([x.to_code() for x in self.arguments]),
         )
         return out
+
+
+@dataclass
+class TableLiteral(Expression):
+    elements: List[Expression]
+
+    def to_code(self) -> str:
+        out = "{{{0}}}".format(", ".join([x.to_code() for x in self.elements]))
+        return out
+
+
+@dataclass
+class IndexExpression(Expression):
+    left: Expression
+    index: Expression
+
+    def to_code(self) -> str:
+        return "({0}[{1}])".format(self.left.to_code(), self.index.to_code())
