@@ -155,6 +155,14 @@ class String(Obj):
     def inspect(self) -> str:
         return self.value
 
+    def __hash__(self):
+        return hash(self.value)
+
+    # def __eq__(self, other):
+    # if not other:
+    # return False
+    # return self.value == other.value
+
 
 @dataclass
 class Builtin(Obj):
@@ -170,14 +178,24 @@ class Builtin(Obj):
 @dataclass
 class Table(Obj):
     elements: List[Obj]
+    pairs: Dict[Obj, Obj] = field(default_factory=lambda: {})
 
     def type(self) -> ObjType:
         return ObjType.TABLE
 
     def inspect(self) -> str:
-        out: str = ""
-        signature = ", ".join([x.inspect() for x in self.elements])
-        return "{{{0}}}".format(signature)
+        value_signature = ", ".join([x.inspect() for x in self.elements])
+        pairs_signature = ", ".join(
+            [f"{x[0].inspect()} = {x[1].inspect()}" for x in self.pairs.items()]
+        )
+
+        out: str = "{"
+        out = out + value_signature
+        if value_signature and pairs_signature:
+            out = out + ", "
+        out = out + pairs_signature
+        out = out + "}"
+        return out
 
 
 TRUE = Boolean(value=True)

@@ -1,8 +1,8 @@
-from typing import cast, Optional, List
+from typing import cast, Optional, List, Tuple, Dict
 
 from . import ast
 from . import obj
-from .builtins import builtins
+from luatopy.builtins import builtins
 
 from .obj import TRUE, FALSE, NULL
 
@@ -108,7 +108,11 @@ def evaluate(node: ast.Node, env: obj.Environment):
         if len(elements) == 1 and is_error(elements[0]):
             return elements[0]
 
-        return obj.Table(elements=elements)
+        pairs = evaluate_expression_pairs(table_literal.pairs, env)
+        # if len(pairs) == 1 and is_error(pairs[0]):
+        # return paris[0]
+
+        return obj.Table(elements=elements, pairs=pairs)
 
     if klass == ast.IndexExpression:
         index_expression: ast.IndexExpression = cast(ast.IndexExpression, node)
@@ -130,6 +134,10 @@ def evaluate_index_expression(left: obj.Obj, index: obj.Obj) -> obj.Obj:
         return evaluate_table_index_expression(
             cast(obj.Table, left), cast(obj.Integer, index)
         )
+    if left.type() == obj.ObjType.TABLE and index.type() == obj.ObjType.STRING:
+        return evaluate_table_key_expression(
+            cast(obj.Table, left), cast(obj.String, index)
+        )
 
     return obj.Error.create("Index operation not supported")
 
@@ -140,6 +148,16 @@ def evaluate_table_index_expression(
     index_value: int = index.value
     try:
         return table.elements[index_value - 1]
+    except:
+        return NULL
+
+
+def evaluate_table_key_expression(
+    table: obj.Table, index: obj.String
+) -> obj.Obj:
+    index_value: str = index.value
+    try:
+        return table.pairs[index]
     except:
         return NULL
 
@@ -191,6 +209,19 @@ def evaluate_expressions(
         result.append(evaluated)
 
     return result
+
+
+def evaluate_expression_pairs(
+    expressions: List[Tuple[ast.Expression, ast.Expression]],
+    env: obj.Environment,
+) -> Dict[obj.Obj, obj.Obj]:
+    out: Dict[obj.Obj, obj.Obj] = {}
+    for key_exp, val_exp in expressions:
+        key: obj.Obj = evaluate(key_exp, env)
+        value: obj.Obj = evaluate(val_exp, env)
+        out[key] = value
+
+    return out
 
 
 def evaluate_identifier(
@@ -327,9 +358,6 @@ def evaluate_infix_expression(
         return obj.Error.create(
             "Attempt to perform arithmetic on a boolean value"
         )
-
-    # if left.type() != right.type():
-    # return obj.Error.create("Type mismatch")
 
     if operator == "==":
         return native_bool_to_bool_obj(left == right)

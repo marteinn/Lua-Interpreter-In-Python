@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import List, Optional, Dict, Tuple
 
 from .token import Token
 
@@ -117,7 +117,6 @@ class BlockStatement(Statement):
 
     def to_code(self) -> str:
         out = [x.to_code() for x in self.statements]
-        # out = [x for x in out if x]
         return "\n".join(out)
 
 
@@ -173,9 +172,26 @@ class CallExpression(Expression):
 @dataclass
 class TableLiteral(Expression):
     elements: List[Expression]
+    pairs: List[Tuple[Expression, Expression]] = field(
+        default_factory=list
+    )
 
     def to_code(self) -> str:
-        out = "{{{0}}}".format(", ".join([x.to_code() for x in self.elements]))
+        out = "{"
+        if self.elements:
+            out = out + "{0}".format(
+                ", ".join([x.to_code() for x in self.elements])
+            )
+
+        if self.elements and self.pairs:
+            out = out + ", "
+
+        if self.pairs:
+            out = out + ", ".join(
+                [f"{x[0].to_code()} = {x[1].to_code()}" for x in self.pairs]
+            )
+
+        out = out + "}"
         return out
 
 

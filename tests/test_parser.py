@@ -248,6 +248,44 @@ class ParserTest(unittest.TestCase):
         self.assertIs(type(statement), ast.ExpressionStatement)
         self.assertIs(type(statement.expression), ast.TableLiteral)
 
+    def test_table_key_value(self):
+        tests = [
+            (
+                '{key = 1, ["key2"] = 2}',
+                '{"key" = 1, "key2" = 2}',
+            ),
+            (
+                '{1, key = 2}',
+                '{1, "key" = 2}',
+            ),
+            (
+                '{[a + b] = 2}',
+                '{(a + b) = 2}',
+            ),
+            (
+                '{[a] = 2}',
+                '{a = 2}',
+            ),
+            (
+                '{a = {1, 2}}',
+                '{"a" = {1, 2}}',
+            ),
+            (
+                '{[1] = 2}',
+                '{1 = 2}',
+            ),
+            (
+                '{"hello", "goodbye"}',
+                '{"hello", "goodbye"}',
+            ),
+        ]
+
+        for source, expected in tests:
+            self.assertEqual(
+                program_from_source(source).to_code(),
+                expected,
+            )
+
     def test_parsing_index_expressions(self):
         program = program_from_source("values[1]")
 

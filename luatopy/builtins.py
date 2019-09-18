@@ -1,7 +1,7 @@
 from typing import Any, Dict, Optional, List
 
-from . import obj
-from .obj import TRUE, FALSE, NULL
+from luatopy import obj
+from luatopy.obj import TRUE, FALSE, NULL
 
 
 builtins: Dict[str, Any] = {}

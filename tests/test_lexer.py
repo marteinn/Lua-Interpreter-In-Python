@@ -270,3 +270,24 @@ a = false
 
             self.assertEqual(expected_token[0], token.token_type)
             self.assertEqual(expected_token[1], token.literal)
+
+    def test_table_hashmap_declaration(self):
+        source = "{random = 2}"
+        # source = '{random = 2}; {["random"] = 2}
+
+        lexer = Lexer(StringIO(source))
+
+        tokens = [
+            (TokenType.LBRACE, "{"),
+            (TokenType.IDENTIFIER, "random"),
+            (TokenType.ASSIGN, "="),
+            (TokenType.INT, "2"),
+            (TokenType.RBRACE, "}"),
+            (TokenType.EOF, "<<EOF>>"),
+        ]
+
+        for expected_token in tokens:
+            token = lexer.next_token()
+
+            self.assertEqual(expected_token[0], token.token_type)
+            self.assertEqual(expected_token[1], token.literal)
