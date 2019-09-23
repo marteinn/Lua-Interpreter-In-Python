@@ -69,6 +69,9 @@ class Integer(Obj):
     def inspect(self) -> str:
         return str(self.value)
 
+    def __hash__(self):
+        return hash(self.value)
+
 
 @dataclass
 class Float(Obj):
@@ -177,22 +180,17 @@ class Builtin(Obj):
 
 @dataclass
 class Table(Obj):
-    elements: List[Obj]
-    pairs: Dict[Obj, Obj] = field(default_factory=lambda: {})
+    elements: Dict[Obj, Obj]
 
     def type(self) -> ObjType:
         return ObjType.TABLE
 
     def inspect(self) -> str:
-        value_signature = ", ".join([x.inspect() for x in self.elements])
         pairs_signature = ", ".join(
-            [f"{x[0].inspect()} = {x[1].inspect()}" for x in self.pairs.items()]
+            [f"{x[0].inspect()} = {x[1].inspect()}" for x in self.elements.items()]
         )
 
         out: str = "{"
-        out = out + value_signature
-        if value_signature and pairs_signature:
-            out = out + ", "
         out = out + pairs_signature
         out = out + "}"
         return out

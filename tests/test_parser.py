@@ -8,17 +8,10 @@ from luatopy import ast
 
 class ParserTest(unittest.TestCase):
     def test_prefix_parsing(self):
-        tests = (
-            ("-1", "(-1)"),
-            ("not 1", "(not 1)"),
-            ("not not 1", "(not (not 1))"),
-        )
+        tests = (("-1", "(-1)"), ("not 1", "(not 1)"), ("not not 1", "(not (not 1))"))
 
         for source, expected in tests:
-            self.assertEqual(
-                program_from_source(source).to_code(),
-                expected,
-            )
+            self.assertEqual(program_from_source(source).to_code(), expected)
 
     def test_influx_parsing(self):
         tests = (
@@ -35,21 +28,13 @@ class ParserTest(unittest.TestCase):
         )
 
         for source, expected in tests:
-            self.assertEqual(
-                program_from_source(source).to_code(),
-                expected,
-            )
+            self.assertEqual(program_from_source(source).to_code(), expected)
 
     def test_string_influx_parsing(self):
-        tests = (
-            ('"hello " .. "world"', '("hello " .. "world")'),
-        )
+        tests = (('"hello " .. "world"', '("hello " .. "world")'),)
 
         for source, expected in tests:
-            self.assertEqual(
-                program_from_source(source).to_code(),
-                expected,
-            )
+            self.assertEqual(program_from_source(source).to_code(), expected)
 
     def test_operator_precedence(self):
         tests = (
@@ -66,14 +51,11 @@ class ParserTest(unittest.TestCase):
             ("b ~= true", "(b ~= true)"),
             ("a+b(c*d)+e", "((a + b((c * d))) + e)"),
             ("add(a + b * c + d / e - f)", "add((((a + (b * c)) + (d / e)) - f))"),
-            ("a * {1, 2}[b * c] * d", "((a * ({1, 2}[(b * c)])) * d)"),
+            ("a * {1, 2}[b * c] * d", "((a * ({1 = 1, 2 = 2}[(b * c)])) * d)"),
         )
 
         for source, expected in tests:
-            self.assertEqual(
-                program_from_source(source).to_code(),
-                expected,
-            )
+            self.assertEqual(program_from_source(source).to_code(), expected)
 
     def test_operator_precedence_groups(self):
         tests = (
@@ -83,17 +65,10 @@ class ParserTest(unittest.TestCase):
         )
 
         for source, expected in tests:
-            self.assertEqual(
-                program_from_source(source).to_code(),
-                expected,
-            )
+            self.assertEqual(program_from_source(source).to_code(), expected)
 
     def test_semicolon_delimiter(self):
-        tests = (
-            ("1; b", 2),
-            ("a = 1; b = 2;", 2),
-            ("1 + 2; 3 + 3;d = 5; 5 * 5", 4),
-        )
+        tests = (("1; b", 2), ("a = 1; b = 2;", 2), ("1 + 2; 3 + 3;d = 5; 5 * 5", 4))
 
         for source, expected in tests:
             program = program_from_source(source)
@@ -140,14 +115,8 @@ class ParserTest(unittest.TestCase):
 
     def test_if_statements(self):
         tests = (
-            (
-                "if 1 > 2 then 1 end",
-                "if (1 > 2) then 1 end",
-            ),
-            (
-                "if 1 > 2 then 1 else 5 end",
-                "if (1 > 2) then 1 else 5 end"
-            ),
+            ("if 1 > 2 then 1 end", "if (1 > 2) then 1 end"),
+            ("if 1 > 2 then 1 else 5 end", "if (1 > 2) then 1 else 5 end"),
             (
                 "if 1 > 2 then if true then 1 end end",
                 "if (1 > 2) then if true then 1 end end",
@@ -155,84 +124,39 @@ class ParserTest(unittest.TestCase):
         )
 
         for source, expected in tests:
-            self.assertEqual(
-                program_from_source(source).to_code(),
-                expected,
-            )
+            self.assertEqual(program_from_source(source).to_code(), expected)
 
     def test_function_statements(self):
         tests = (
-            (
-                "function (x, y) x*y end",
-                "function (x, y) (x * y) end",
-            ),
-            (
-                "function () 1 end",
-                "function () 1 end",
-            ),
-            (
-                "function (x, y, z) 1 end",
-                "function (x, y, z) 1 end",
-            ),
-            (
-                "function () end",
-                "function () end",
-            ),
-            (
-                "function () return 1 end",
-                "function () return 1 end",
-            ),
-            (
-                "function foo () return 1 end",
-                "function foo () return 1 end",
-            ),
+            ("function (x, y) x*y end", "function (x, y) (x * y) end"),
+            ("function () 1 end", "function () 1 end"),
+            ("function (x, y, z) 1 end", "function (x, y, z) 1 end"),
+            ("function () end", "function () end"),
+            ("function () return 1 end", "function () return 1 end"),
+            ("function foo () return 1 end", "function foo () return 1 end"),
         )
 
         for source, expected in tests:
-            self.assertEqual(
-                program_from_source(source).to_code(),
-                expected,
-            )
+            self.assertEqual(program_from_source(source).to_code(), expected)
 
     def test_function_statements(self):
         tests = (
-            (
-                "abc(1, 2)",
-                "abc(1, 2)",
-            ),
-            (
-                "random(m, 1+1*2)",
-                "random(m, (1 + (1 * 2)))",
-            ),
+            ("abc(1, 2)", "abc(1, 2)"),
+            ("random(m, 1+1*2)", "random(m, (1 + (1 * 2)))"),
         )
 
         for source, expected in tests:
-            self.assertEqual(
-                program_from_source(source).to_code(),
-                expected,
-            )
+            self.assertEqual(program_from_source(source).to_code(), expected)
 
     def test_return_statements(self):
         tests = (
-            (
-                "return 1",
-                "return 1",
-            ),
-            (
-                "return 1+b",
-                "return (1 + b)",
-            ),
-            (
-                "return false",
-                "return false",
-            ),
+            ("return 1", "return 1"),
+            ("return 1+b", "return (1 + b)"),
+            ("return false", "return false"),
         )
 
         for source, expected in tests:
-            self.assertEqual(
-                program_from_source(source).to_code(),
-                expected,
-            )
+            self.assertEqual(program_from_source(source).to_code(), expected)
 
     def test_string_literal(self):
         program = program_from_source('"hello world"')
@@ -250,41 +174,17 @@ class ParserTest(unittest.TestCase):
 
     def test_table_key_value(self):
         tests = [
-            (
-                '{key = 1, ["key2"] = 2}',
-                '{"key" = 1, "key2" = 2}',
-            ),
-            (
-                '{1, key = 2}',
-                '{1, "key" = 2}',
-            ),
-            (
-                '{[a + b] = 2}',
-                '{(a + b) = 2}',
-            ),
-            (
-                '{[a] = 2}',
-                '{a = 2}',
-            ),
-            (
-                '{a = {1, 2}}',
-                '{"a" = {1, 2}}',
-            ),
-            (
-                '{[1] = 2}',
-                '{1 = 2}',
-            ),
-            (
-                '{"hello", "goodbye"}',
-                '{"hello", "goodbye"}',
-            ),
+            ('{key = 1, ["key2"] = 2}', '{"key" = 1, "key2" = 2}'),
+            ("{1, key = 2}", '{1 = 1, "key" = 2}'),
+            ("{[a + b] = 2}", "{(a + b) = 2}"),
+            ("{[a] = 2}", "{a = 2}"),
+            ("{a = {1, 2}}", '{"a" = {1 = 1, 2 = 2}}'),
+            ("{[1] = 2}", "{1 = 2}"),
+            ('{"hello", "goodbye"}', '{1 = "hello", 2 = "goodbye"}'),
         ]
 
         for source, expected in tests:
-            self.assertEqual(
-                program_from_source(source).to_code(),
-                expected,
-            )
+            self.assertEqual(program_from_source(source).to_code(), expected)
 
     def test_parsing_index_expressions(self):
         program = program_from_source("values[1]")

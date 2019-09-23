@@ -50,9 +50,7 @@ def evaluate(node: ast.Node, env: obj.Environment):
         if is_error(infix_right):
             return infix_right
 
-        return evaluate_infix_expression(
-            infix_exp.operator, infix_left, infix_right
-        )
+        return evaluate_infix_expression(infix_exp.operator, infix_left, infix_right)
 
     if klass == ast.BlockStatement:
         block_statement: ast.BlockStatement = cast(ast.BlockStatement, node)
@@ -104,15 +102,11 @@ def evaluate(node: ast.Node, env: obj.Environment):
 
     if klass == ast.TableLiteral:
         table_literal: ast.TableLiteral = cast(ast.TableLiteral, node)
-        elements = evaluate_expressions(table_literal.elements, env)
-        if len(elements) == 1 and is_error(elements[0]):
-            return elements[0]
-
-        pairs = evaluate_expression_pairs(table_literal.pairs, env)
-        # if len(pairs) == 1 and is_error(pairs[0]):
+        elements = evaluate_expression_pairs(table_literal.elements, env)
+        # if len(elements) == 1 and is_error(elements):
         # return paris[0]
 
-        return obj.Table(elements=elements, pairs=pairs)
+        return obj.Table(elements=elements)
 
     if klass == ast.IndexExpression:
         index_expression: ast.IndexExpression = cast(ast.IndexExpression, node)
@@ -142,29 +136,22 @@ def evaluate_index_expression(left: obj.Obj, index: obj.Obj) -> obj.Obj:
     return obj.Error.create("Index operation not supported")
 
 
-def evaluate_table_index_expression(
-    table: obj.Table, index: obj.Integer
-) -> obj.Obj:
-    index_value: int = index.value
+def evaluate_table_index_expression(table: obj.Table, index: obj.Integer) -> obj.Obj:
     try:
-        return table.elements[index_value - 1]
+        return table.elements[index]
     except:
         return NULL
 
 
-def evaluate_table_key_expression(
-    table: obj.Table, index: obj.String
-) -> obj.Obj:
+def evaluate_table_key_expression(table: obj.Table, index: obj.String) -> obj.Obj:
     index_value: str = index.value
     try:
-        return table.pairs[index]
+        return table.elements[index]
     except:
         return NULL
 
 
-def apply_function(
-    fn: obj.Obj, args: List[obj.Obj], env: obj.Environment
-) -> obj.Obj:
+def apply_function(fn: obj.Obj, args: List[obj.Obj], env: obj.Environment) -> obj.Obj:
     if type(fn) == obj.Function:
         fn_fn = cast(obj.Function, fn)
         extended_env = extend_function_env(fn_fn, args)
@@ -185,9 +172,7 @@ def unwrap_return_value(value: obj.Obj) -> obj.Obj:
     return value
 
 
-def extend_function_env(
-    fn: obj.Function, args: List[obj.Obj]
-) -> obj.Environment:
+def extend_function_env(fn: obj.Function, args: List[obj.Obj]) -> obj.Environment:
     enclosed_env = obj.Environment.create_enclosed(fn.env)
 
     param: ast.Identifier
@@ -212,8 +197,7 @@ def evaluate_expressions(
 
 
 def evaluate_expression_pairs(
-    expressions: List[Tuple[ast.Expression, ast.Expression]],
-    env: obj.Environment,
+    expressions: List[Tuple[ast.Expression, ast.Expression]], env: obj.Environment
 ) -> Dict[obj.Obj, obj.Obj]:
     out: Dict[obj.Obj, obj.Obj] = {}
     for key_exp, val_exp in expressions:
@@ -224,9 +208,7 @@ def evaluate_expression_pairs(
     return out
 
 
-def evaluate_identifier(
-    identifier: ast.Identifier, env: obj.Environment
-) -> obj.Obj:
+def evaluate_identifier(identifier: ast.Identifier, env: obj.Environment) -> obj.Obj:
     val, found = env.get(identifier.value, NULL)
     if found:
         return val
@@ -251,9 +233,7 @@ def evaluate_program(program: ast.Program, env: obj.Environment):
     return result
 
 
-def evaluate_block_statement(
-    block_statement: ast.BlockStatement, env: obj.Environment
-):
+def evaluate_block_statement(block_statement: ast.BlockStatement, env: obj.Environment):
     result = None
     for statement in block_statement.statements:
         result = evaluate(statement, env)
@@ -306,9 +286,7 @@ def evaluate_prefix_expression(operator: str, right: obj.Obj) -> obj.Obj:
     if operator == "-":
         return evaluate_minus_operator_expression(right)
 
-    return obj.Error.create(
-        "Unknown operator {0}{0}", operator, right.inspect()
-    )
+    return obj.Error.create("Unknown operator {0}{0}", operator, right.inspect())
 
 
 def evaluate_not_operator_expression(right: obj.Obj) -> obj.Boolean:
@@ -323,9 +301,7 @@ def evaluate_not_operator_expression(right: obj.Obj) -> obj.Boolean:
 
 def evaluate_minus_operator_expression(right: obj.Obj) -> obj.Obj:
     if right.type() == obj.ObjType.BOOLEAN:
-        return obj.Error.create(
-            "Attempt to perform arithmetic on a boolean value"
-        )
+        return obj.Error.create("Attempt to perform arithmetic on a boolean value")
 
     if type(right) != obj.Integer:
         return NULL
@@ -334,9 +310,7 @@ def evaluate_minus_operator_expression(right: obj.Obj) -> obj.Obj:
     return obj.Integer(value=0 - obj_int.value)
 
 
-def evaluate_infix_expression(
-    operator: str, left: obj.Obj, right: obj.Obj
-) -> obj.Obj:
+def evaluate_infix_expression(operator: str, left: obj.Obj, right: obj.Obj) -> obj.Obj:
     if type(left) == obj.Integer and type(right) == obj.Integer:
         left_val = cast(obj.Integer, left)
         right_val = cast(obj.Integer, right)
@@ -345,9 +319,7 @@ def evaluate_infix_expression(
     if type(left) == obj.String and type(right) == obj.String:
         left_str_val = cast(obj.String, left)
         right_str_val = cast(obj.String, right)
-        return evaluate_infix_string_expression(
-            operator, left_str_val, right_str_val
-        )
+        return evaluate_infix_string_expression(operator, left_str_val, right_str_val)
 
     if obj.ObjType.BOOLEAN in [left.type(), right.type()] and operator in [
         "+",
@@ -355,9 +327,7 @@ def evaluate_infix_expression(
         "*",
         "/",
     ]:
-        return obj.Error.create(
-            "Attempt to perform arithmetic on a boolean value"
-        )
+        return obj.Error.create("Attempt to perform arithmetic on a boolean value")
 
     if operator == "==":
         return native_bool_to_bool_obj(left == right)

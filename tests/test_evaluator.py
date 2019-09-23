@@ -27,9 +27,7 @@ class EvaluatorTest(unittest.TestCase):
             self.assertEqual(evaluated.value, expected)
 
     def test_float_expressions(self):
-        tests = [
-            ("4 / 2", 2.0),
-        ]
+        tests = [("4 / 2", 2.0)]
 
         for source, expected in tests:
             evaluated = source_to_eval(source)
@@ -108,21 +106,30 @@ class EvaluatorTest(unittest.TestCase):
     def test_return_statements(self):
         tests = [
             ("return 5", 5),
-            ("""return 5
+            (
+                """return 5
 10
-""", 5),
+""",
+                5,
+            ),
             ("return 5*5", 25),
-            ("""10
+            (
+                """10
 return 5
-""", 5),
-            ("""
+""",
+                5,
+            ),
+            (
+                """
              if true then
                 if true then
                     return 10
                 end
                 return 5
              end
-             """, 10),
+             """,
+                10,
+            ),
         ]
 
         for source, expected in tests:
@@ -136,30 +143,34 @@ return 5
             ("1 + true", "Attempt to perform arithmetic on a boolean value"),
             ("-true", "Attempt to perform arithmetic on a boolean value"),
             (
-"""1 + true
+                """1 + true
 5
-""", "Attempt to perform arithmetic on a boolean value"),
+""",
+                "Attempt to perform arithmetic on a boolean value",
+            ),
             ("true + false", "Attempt to perform arithmetic on a boolean value"),
             (
                 "if true then true + false end",
-                "Attempt to perform arithmetic on a boolean value"
+                "Attempt to perform arithmetic on a boolean value",
             ),
             (
                 "if true then if true then true + false end end",
-                "Attempt to perform arithmetic on a boolean value"
+                "Attempt to perform arithmetic on a boolean value",
             ),
-(
-"""5
+            (
+                """5
 true + false
 6
-""", "Attempt to perform arithmetic on a boolean value"),
+""",
+                "Attempt to perform arithmetic on a boolean value",
+            ),
             (
                 "if true then if true then return true + false end return 5 end",
-                "Attempt to perform arithmetic on a boolean value"
+                "Attempt to perform arithmetic on a boolean value",
             ),
             (
                 "if true + false then 1 else 2 end",
-                "Attempt to perform arithmetic on a boolean value"
+                "Attempt to perform arithmetic on a boolean value",
             ),
             ("foobar", "Identifier foobar not found"),  # TODO: lua returns nil
         ]
@@ -184,13 +195,12 @@ true + false
             self.assertEqual(type(evaluated), obj.Integer)
             self.assertEqual(evaluated.value, expected)
 
-
     def test_function_declaration(self):
         tests = [
             (
                 "function (a) a = a + 1; return a end",
-                "function (a)\na = (a + 1)\nreturn a\nend"
-            ),
+                "function (a)\na = (a + 1)\nreturn a\nend",
+            )
         ]
 
         for source, expected in tests:
@@ -211,7 +221,6 @@ true + false
             evaluated = source_to_eval(source)
             self.assertEqual(evaluated.value, expected)
 
-
     def test_function_closure(self):
         source = """
 add = function (x) function (y) x + y end end
@@ -223,9 +232,7 @@ add_two(3)
         self.assertEqual(evaluated.value, 5)
 
     def test_string_expressions(self):
-        tests = [
-            ('"hello world"', 'hello world'),
-        ]
+        tests = [('"hello world"', "hello world")]
 
         for source, expected in tests:
             evaluated = source_to_eval(source)
@@ -234,8 +241,8 @@ add_two(3)
     def test_builints(self):
         tests = [
             ('type("string")', "string"),
-            ('type(1)', "number"),
-            ('type(true)', "boolean"),
+            ("type(1)", "number"),
+            ("type(true)", "boolean"),
         ]
 
         for source, expected in tests:
@@ -244,12 +251,13 @@ add_two(3)
 
     def test_table_expressions(self):
         tests = [
-            ("{1, 2, (1 + 2)}", "{1, 2, 3}"),
-            ("a = {1, 2, 3}; a", "{1, 2, 3}"),
-            ('{1, "random", 3}', '{1, random, 3}'),
-            ('{key = 1}', '{key = 1}'),
-            ('{key = 1, ["morekey"] = 2}', '{key = 1, morekey = 2}'),
-            ('a = "hello"; {[a] = 1}', '{hello = 1}'),
+            ("{1, 2, (1 + 2)}", "{1 = 1, 2 = 2, 3 = 3}"),
+            ("a = {1, 2, 3}; a", "{1 = 1, 2 = 2, 3 = 3}"),
+            ('{1, "random", 3}', "{1 = 1, 2 = random, 3 = 3}"),
+            ("{key = 1}", "{key = 1}"),
+            ('{key = 1, ["morekey"] = 2}', "{key = 1, morekey = 2}"),
+            ('a = "hello"; {[a] = 1}', "{hello = 1}"),
+            # ('{[1] = 1, [2] = 2}', '{1, 2, 3}'),
         ]
 
         for source, expected in tests:

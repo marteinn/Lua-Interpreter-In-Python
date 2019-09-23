@@ -163,34 +163,24 @@ class CallExpression(Expression):
 
     def to_code(self) -> str:
         out = "{0}({1})".format(
-            self.function.to_code(),
-            ", ".join([x.to_code() for x in self.arguments]),
+            self.function.to_code(), ", ".join([x.to_code() for x in self.arguments])
         )
         return out
 
 
 @dataclass
 class TableLiteral(Expression):
-    elements: List[Expression]
-    pairs: List[Tuple[Expression, Expression]] = field(
-        default_factory=list
-    )
+    elements: List[Tuple[Expression, Expression]]
 
     def to_code(self) -> str:
         out = "{"
-        if self.elements:
-            out = out + "{0}".format(
-                ", ".join([x.to_code() for x in self.elements])
-            )
 
-        if self.elements and self.pairs:
-            out = out + ", "
+        items = []
+        for key, value in self.elements:
+            key_code = key.to_code()
+            items.append(f"{key_code} = {value.to_code()}")
 
-        if self.pairs:
-            out = out + ", ".join(
-                [f"{x[0].to_code()} = {x[1].to_code()}" for x in self.pairs]
-            )
-
+        out = out + ", ".join(x for x in items)
         out = out + "}"
         return out
 
