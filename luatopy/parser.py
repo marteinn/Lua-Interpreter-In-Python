@@ -371,7 +371,7 @@ class Parser:
 
         if self.peek_token.token_type == TokenType.RBRACE:
             self.next_token()
-            return expressions, pairs
+            return []
 
         self.next_token()
 

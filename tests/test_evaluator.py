@@ -251,13 +251,14 @@ add_two(3)
 
     def test_table_expressions(self):
         tests = [
+            ("{}", "{}"),
             ("{1, 2, (1 + 2)}", "{1 = 1, 2 = 2, 3 = 3}"),
             ("a = {1, 2, 3}; a", "{1 = 1, 2 = 2, 3 = 3}"),
             ('{1, "random", 3}', "{1 = 1, 2 = random, 3 = 3}"),
             ("{key = 1}", "{key = 1}"),
             ('{key = 1, ["morekey"] = 2}', "{key = 1, morekey = 2}"),
             ('a = "hello"; {[a] = 1}', "{hello = 1}"),
-            # ('{[1] = 1, [2] = 2}', '{1, 2, 3}'),
+            ('{[1] = 1, [2] = 2}', '{1 = 1, 2 = 2}'),
         ]
 
         for source, expected in tests:
