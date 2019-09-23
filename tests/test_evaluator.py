@@ -84,6 +84,19 @@ class EvaluatorTest(unittest.TestCase):
             self.assertEqual(type(evaluated), obj.Boolean)
             self.assertEqual(evaluated.value, expected)
 
+    def test_length_prefix_operator(self):
+        tests = [
+            ('#"hello"', 5),
+            ('#{10, 20, 30}', 3),
+            ('#{[1] = 1, [(1+1)] = 2, 3}', 2),
+        ]
+
+        for source, expected in tests:
+            evaluated = source_to_eval(source)
+
+            self.assertEqual(type(evaluated), obj.Integer)
+            self.assertEqual(evaluated.value, expected)
+
     def test_if_else_expressions(self):
         tests = [
             ("if true then 10 end", 10),
@@ -243,6 +256,8 @@ add_two(3)
             ('type("string")', "string"),
             ("type(1)", "number"),
             ("type(true)", "boolean"),
+            ("type({})", "table"),
+            ("type(function (a) a = a + 1; return a end)", "function"),
         ]
 
         for source, expected in tests:

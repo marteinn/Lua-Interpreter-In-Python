@@ -187,7 +187,10 @@ class Table(Obj):
 
     def inspect(self) -> str:
         pairs_signature = ", ".join(
-            [f"{x[0].inspect()} = {x[1].inspect()}" for x in self.elements.items()]
+            [
+                f"{x[0].inspect()} = {x[1].inspect()}"
+                for x in self.elements.items()
+            ]
         )
 
         out: str = "{"

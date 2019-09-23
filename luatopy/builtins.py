@@ -24,6 +24,10 @@ def builtin_type(*args: obj.Obj) -> obj.Obj:
         value_type = "number"
     if type(value) == obj.Boolean:
         value_type = "boolean"
+    if type(value) == obj.Table:
+        value_type = "table"
+    if type(value) == obj.Function:
+        value_type = "function"
 
     if not value_type:
         return NULL

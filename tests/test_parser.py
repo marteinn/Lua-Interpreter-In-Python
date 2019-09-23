@@ -8,7 +8,11 @@ from luatopy import ast
 
 class ParserTest(unittest.TestCase):
     def test_prefix_parsing(self):
-        tests = (("-1", "(-1)"), ("not 1", "(not 1)"), ("not not 1", "(not (not 1))"))
+        tests = (
+            ("-1", "(-1)"), ("not 1", "(not 1)"), ("not not 1", "(not (not 1))"),
+            ('#{1, 2}', '(#{1 = 1, 2 = 2})'),
+            ('#"hello"', '(#"hello")'),
+        )
 
         for source, expected in tests:
             self.assertEqual(program_from_source(source).to_code(), expected)

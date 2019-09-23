@@ -16,6 +16,7 @@ class TokenType(Enum):
     FALSE = auto()
 
     COMMENT = auto()
+    HASH = auto()
 
     ASSIGN = auto()
     PLUS = auto()
