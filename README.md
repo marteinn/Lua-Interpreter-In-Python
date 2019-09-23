@@ -6,8 +6,7 @@ This is my second take on writing a Lua-To-Python compiler, it includes:
 - [x] Parser
 - [x] A internal AST representation
 - [x] Repl
-- [ ] Interpeter
-- [ ] Python AST compilation
+- [x] Interpeter
 
 
 ## Running repl
@@ -20,6 +19,7 @@ This is my second take on writing a Lua-To-Python compiler, it includes:
 - [ ] Named functions
 - [ ] Not defined variables should return `nil`
 - [ ] Handle global vs local variables in lua style
+- [ ] Different types of loops
 
 
 ## References
