@@ -35,8 +35,8 @@ builtins = register(builtins, "type", builtin_type)
 
 def builtin_print(*args: obj.Obj) -> obj.Obj:
     out: List[str] = [x.inspect() for x in args]
-    # TODO: Add a way to detect stdout and how to write
-    return obj.String(value="   ".join(out))
+    print("   ".join(out))
+    return NULL
 
 
 builtins = register(builtins, "print", builtin_print)
