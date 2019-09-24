@@ -237,7 +237,7 @@ def evaluate_identifier(
     if identifier.value in builtins:
         return builtins[identifier.value]
 
-    return obj.Error.create("Identifier {0} not found", identifier.value)
+    return NULL
 
 
 def evaluate_program(program: ast.Program, env: obj.Environment):

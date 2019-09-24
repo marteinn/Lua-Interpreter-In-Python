@@ -185,7 +185,6 @@ true + false
                 "if true + false then 1 else 2 end",
                 "Attempt to perform arithmetic on a boolean value",
             ),
-            ("foobar", "Identifier foobar not found"),  # TODO: lua returns nil
         ]
 
         for source, expected in tests:
@@ -193,6 +192,16 @@ true + false
 
             self.assertEqual(type(evaluated), obj.Error)
             self.assertEqual(evaluated.message, expected)
+
+    def test_that_non_existing_identifiers_returns_nil(self):
+        tests = [
+            ("a", "nil"),
+        ]
+
+        for source, expected in tests:
+            evaluated = source_to_eval(source)
+
+            self.assertEqual(type(evaluated), obj.Null)
 
     def test_assignments(self):
         tests = [

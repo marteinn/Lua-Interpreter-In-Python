@@ -1,4 +1,4 @@
-# Lua to Python 2
+# Lua interpreter in Python
 
 This is my second take on writing a Lua-To-Python compiler, it includes:
 
@@ -17,9 +17,41 @@ This is my second take on writing a Lua-To-Python compiler, it includes:
 ## TODO
 - [x] Introduce `;` as a separator
 - [x] Named functions
-- [ ] Not defined variables should return `nil`
+- [x] Not defined variables should return `nil`
+- [ ] Modulo operator
+- [ ] `and` operator
+- [ ] `or` operator
+- [ ] `elseif` statement
+- [ ] Variables with numbers in name
+- [ ] Iterator for Table using `pairs`/`ipairs`
+- [ ] `_G` for globals access
+- [ ] `for` loop
+- [ ] `while` loop
+- [ ] `repeat` loop
+- [ ] Short circuit / tenary operator
+- [ ] Dot property syntax in Table for string keys
+- [ ] Numbers beginning with `.` (Ex `.5`)
 - [ ] Handle global vs local variables in lua style
-- [ ] Different types of loops
+- [ ] Function calls with single params should not require parens
+- [ ] Metatable support for tables
+
+
+## Supports
+- Single and multiline comments
+- Variable assignments
+- Numbers
+- Strings
+- Tables
+- Addition, multiplication and division
+- If statements
+- Comparison operators (`==`, `>=`, `>`, `<`, `<≠`, `~=`)
+- String concat `..`
+- `return`
+- `function` declarations (both named and anymous with closures)
+- `not` logical operator
+- Negative values
+- Table indexing
+- Table count with `#`
 
 
 ## References
