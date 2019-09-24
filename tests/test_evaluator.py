@@ -222,6 +222,16 @@ true + false
             self.assertEqual(type(evaluated), obj.Function)
             self.assertEqual(evaluated.inspect(), expected)
 
+    def test_named_function_declaration(self):
+        tests = [
+            ("function f (a) a + 1 end; f(1)", 2),
+            ("function mycat (name) return name end; mycat('sniff')", 'sniff'),
+        ]
+
+        for source, expected in tests:
+            evaluated = source_to_eval(source)
+            self.assertEqual(evaluated.value, expected)
+
     def test_function_call(self):
         tests = [
             ("f = function (a) a + 1 end; f(1)", 2),

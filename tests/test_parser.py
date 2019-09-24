@@ -143,7 +143,15 @@ class ParserTest(unittest.TestCase):
         for source, expected in tests:
             self.assertEqual(program_from_source(source).to_code(), expected)
 
-    def test_function_statements(self):
+    def test_named_function_statements(self):
+        tests = (
+            ("function bar () 1 end", "function bar () 1 end"),
+        )
+
+        for source, expected in tests:
+            self.assertEqual(program_from_source(source).to_code(), expected)
+
+    def test_function_calls(self):
         tests = (
             ("abc(1, 2)", "abc(1, 2)"),
             ("random(m, 1+1*2)", "random(m, (1 + (1 * 2)))"),

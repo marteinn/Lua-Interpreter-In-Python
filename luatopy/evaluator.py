@@ -84,6 +84,14 @@ def evaluate(node: ast.Node, env: obj.Environment):
 
     if klass == ast.FunctionLiteral:
         fn_literal: ast.FunctionLiteral = cast(ast.FunctionLiteral, node)
+
+        if fn_literal.name:
+            funct_assignment = obj.Function(
+                body=fn_literal.body, parameters=fn_literal.parameters, env=env
+            )
+            env.set(fn_literal.name.value, funct_assignment)
+            return None
+
         return obj.Function(
             body=fn_literal.body, parameters=fn_literal.parameters, env=env
         )
