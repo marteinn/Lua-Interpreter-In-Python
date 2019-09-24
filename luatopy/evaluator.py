@@ -412,6 +412,9 @@ def evaluate_infix_integer_expression(
     if operator == "/":
         return obj.Float(left.value / right.value)
 
+    if operator == "%":
+        return obj.Float(left.value % right.value)
+
     if operator == ">":
         return native_bool_to_bool_obj(left.value > right.value)
 

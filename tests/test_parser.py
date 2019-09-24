@@ -29,6 +29,7 @@ class ParserTest(unittest.TestCase):
             ("5 < 2", "(5 < 2)"),
             ("5 >= 2", "(5 >= 2)"),
             ("5 <= 2", "(5 <= 2)"),
+            ("5 % 10", "(5 % 10)"),
         )
 
         for source, expected in tests:

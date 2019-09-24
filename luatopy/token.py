@@ -24,6 +24,7 @@ class TokenType(Enum):
     ASTERISK = auto()
     SLASH = auto()
     SEMICOLON = auto()
+    PERCENT = auto()
 
     EQ = auto()
     NOT_EQ = auto()

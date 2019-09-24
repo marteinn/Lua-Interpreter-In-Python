@@ -311,3 +311,21 @@ a = false
 
             self.assertEqual(expected_token[0], token.token_type)
             self.assertEqual(expected_token[1], token.literal)
+
+    def test_modulo_operator(self):
+        source = "5 % 10"
+
+        lexer = Lexer(StringIO(source))
+
+        tokens = [
+            (TokenType.INT, "5"),
+            (TokenType.PERCENT, "%"),
+            (TokenType.INT, "10"),
+            (TokenType.EOF, "<<EOF>>"),
+        ]
+
+        for expected_token in tokens:
+            token = lexer.next_token()
+
+            self.assertEqual(expected_token[0], token.token_type)
+            self.assertEqual(expected_token[1], token.literal)

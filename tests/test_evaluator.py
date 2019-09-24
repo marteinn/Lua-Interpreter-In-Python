@@ -27,7 +27,10 @@ class EvaluatorTest(unittest.TestCase):
             self.assertEqual(evaluated.value, expected)
 
     def test_float_expressions(self):
-        tests = [("4 / 2", 2.0)]
+        tests = [
+            ("4 / 2", 2.0),
+            ("5 % 10", 5.0),
+        ]
 
         for source, expected in tests:
             evaluated = source_to_eval(source)
