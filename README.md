@@ -19,7 +19,7 @@ This is my second take on writing a Lua-To-Python compiler, it includes:
 - [x] Named functions
 - [x] Not defined variables should return `nil`
 - [x] Modulo operator
-- [ ] `and` operator
+- [x] `and` operator
 - [ ] `or` operator
 - [ ] `elseif` statement
 - [ ] Variables with numbers in name
@@ -52,6 +52,8 @@ This is my second take on writing a Lua-To-Python compiler, it includes:
 - Negative values
 - Table indexing
 - Table count with `#`
+- Non existing identifiers return nil
+- Modulo operator
 
 
 ## References

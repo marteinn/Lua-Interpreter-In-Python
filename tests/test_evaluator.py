@@ -87,6 +87,20 @@ class EvaluatorTest(unittest.TestCase):
             self.assertEqual(type(evaluated), obj.Boolean)
             self.assertEqual(evaluated.value, expected)
 
+    def test_bool_infix_operations(self):
+        tests = [
+            ("true and true", True),
+            ("false and true", False),
+            ("a = false; b = true; a and b", False),
+            ("function a () return true end; a() and true", True),
+        ]
+
+        for source, expected in tests:
+            evaluated = source_to_eval(source)
+
+            self.assertEqual(type(evaluated), obj.Boolean)
+            self.assertEqual(evaluated.value, expected)
+
     def test_length_prefix_operator(self):
         tests = [
             ('#"hello"', 5),

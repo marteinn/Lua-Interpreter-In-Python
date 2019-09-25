@@ -386,6 +386,9 @@ def evaluate_infix_expression(
     if operator == "~=":
         return native_bool_to_bool_obj(left != right)
 
+    if operator == "and":
+        return native_bool_to_bool_obj(left.value and right.value)
+
     return obj.Error.create("Unknown infix operator {0}", operator)
 
 
