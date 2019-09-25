@@ -20,7 +20,7 @@ This is my second take on writing a Lua-To-Python compiler, it includes:
 - [x] Not defined variables should return `nil`
 - [x] Modulo operator
 - [x] `and` operator
-- [ ] `or` operator
+- [x] `or` operator
 - [ ] `elseif` statement
 - [ ] Variables with numbers in name
 - [ ] Iterator for Table using `pairs`/`ipairs`

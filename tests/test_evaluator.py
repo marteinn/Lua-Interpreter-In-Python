@@ -93,6 +93,10 @@ class EvaluatorTest(unittest.TestCase):
             ("false and true", False),
             ("a = false; b = true; a and b", False),
             ("function a () return true end; a() and true", True),
+            ("false or true", True),
+            ("false or false", False),
+            ("function a () return false end; a() or false", False),
+            ("(true and false) or false", False),
         ]
 
         for source, expected in tests:

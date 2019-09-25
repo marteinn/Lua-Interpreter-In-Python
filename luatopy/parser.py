@@ -39,6 +39,7 @@ precedences: Dict[TokenType, Precedence] = {
     TokenType.EQ: Precedence.EQUALS,
     TokenType.NOT_EQ: Precedence.EQUALS,
     TokenType.AND: Precedence.EQUALS,
+    TokenType.OR: Precedence.EQUALS,
     TokenType.GT: Precedence.LESSGREATER,
     TokenType.GTE: Precedence.LESSGREATER,
     TokenType.LT: Precedence.LESSGREATER,
@@ -81,6 +82,7 @@ class Parser:
             TokenType.EQ: self.parse_infix_expression,
             TokenType.NOT_EQ: self.parse_infix_expression,
             TokenType.AND: self.parse_infix_expression,
+            TokenType.OR: self.parse_infix_expression,
             TokenType.GT: self.parse_infix_expression,
             TokenType.GTE: self.parse_infix_expression,
             TokenType.LT: self.parse_infix_expression,
@@ -97,9 +99,6 @@ class Parser:
 
         self.cur_token: Token = self.lexer.next_token()
         self.peek_token: Token = self.lexer.next_token()
-
-        # self.next_token()
-        # self.next_token()
 
     def next_token(self) -> None:
         self.cur_token = self.peek_token
