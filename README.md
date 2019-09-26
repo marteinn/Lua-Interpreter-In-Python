@@ -22,7 +22,7 @@ This is my second take on writing a Lua-To-Python compiler, it includes:
 - [x] `and` operator
 - [x] `or` operator
 - [ ] `elseif` statement
-- [ ] Variables with numbers in name
+- [x] Variables with numbers in name
 - [ ] Iterator for Table using `pairs`/`ipairs`
 - [ ] `_G` for globals access
 - [ ] `for` loop

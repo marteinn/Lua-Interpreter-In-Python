@@ -264,7 +264,9 @@ class Lexer:
 
     def read_identifier(self) -> str:
         start_position = self.pos
-        while self.ch != EOF_MARKER and is_letter(self.ch):
+        while self.ch != EOF_MARKER and (is_letter(
+            self.ch) or is_digit(self.ch)
+        ):
             self.read_char()
         return self.source[start_position : self.pos]
 

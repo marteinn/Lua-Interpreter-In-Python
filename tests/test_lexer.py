@@ -271,6 +271,24 @@ a = false
             self.assertEqual(expected_token[0], token.token_type)
             self.assertEqual(expected_token[1], token.literal)
 
+    def test_identifier_with_num_in_name(self):
+        source = "hello_1 = 1"
+
+        lexer = Lexer(StringIO(source))
+
+        tokens = [
+            (TokenType.IDENTIFIER, "hello_1"),
+            (TokenType.ASSIGN, "="),
+            (TokenType.INT, "1"),
+            (TokenType.EOF, "<<EOF>>"),
+        ]
+
+        for expected_token in tokens:
+            token = lexer.next_token()
+
+            self.assertEqual(expected_token[0], token.token_type)
+            self.assertEqual(expected_token[1], token.literal)
+
     def test_table_hashmap_declaration(self):
         source = "{random = 2}"
 
